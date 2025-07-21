@@ -238,8 +238,8 @@ main {
 .skills-summary {
     display: flex;
     justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
+    gap: 1rem;
+    margin-top: 1rem;
     flex-wrap: wrap;
 }
 
@@ -248,7 +248,7 @@ main {
 }
 
 .summary-item .value {
-    font-size: 2rem;
+    font-size: 1rem;
     color: var(--primary-color);
     font-family: var(--font-accent);
 }
