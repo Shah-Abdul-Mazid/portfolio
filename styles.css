@@ -1,0 +1,265 @@
+/* ------------------------------------------- */
+/* Reset Default Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+section {
+    padding-top: rem;
+}
+section:target {
+    scroll-margin-top: 2rem;
+}
+
+/* CSS Variables for Consistent Styling */
+:root {
+    --font-primary: "Times New Roman", Times, serif;
+    --font-accent: "Algerian", serif;
+    --text-color: #222222;
+    --background-color: #ffffff;
+    --section-bg: #2c2c2c; 
+    --transition: all 0.3s ease; 
+    --secondary-color: #2ecc71; 
+}
+
+@font-face {
+    font-family: "Algerian";
+    src: url("fonts/Algerian.woff2") format("woff2"),
+         url("fonts/Algerian.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: var(--font-primary);
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.dark {
+    --text-color: #f0f0f0;
+    --background-color: #1a1a1a;
+    --section-bg: #3a3a3a; 
+}
+
+/* ------------------ header and footer ------------------------- */
+header {
+    background-color: var(--section-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(3, 255, 3, 0.2);
+}
+footer {
+    background-color: var(--section-bg);
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-color);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+nav ul {
+    color: var(--text-color);
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem; 
+}
+nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+nav a:hover {
+    color: var(--secondary-color);
+}
+
+/* ------------------ Responsive Design ------------------------- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 1.5rem;
+}
+
+/* Main Content Styling */
+main {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 16px;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+}
+/* Hero Section */
+.hero {
+    min-height: 80vh;
+    background: linear-gradient(to right, var(--section-bg), var(--background-color));
+    display: flex;
+    align-items: center;
+    padding: 2rem 0;
+}
+.hero-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+.hero-text {
+    flex: 1 ;
+}
+.hero-text p {
+    font-size: 1rem;
+    color: var(--text-color);
+    max-width: 900px;
+    margin: 0 auto;
+}
+.hero-text h1 {
+    font-family: var(--font-accent);
+    justify-content: center;
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    position: flex;   
+}
+.hero-text h2 {
+    font-family: var(--font-accent);
+    justify-content: center;
+    text-align: center;
+    font-size: 1.5rem;
+    gap: 10px;
+    color: var(--secondary-color);
+}
+.hero p {
+    font-size: 1rem;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+.hero .profile-image img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--primary-color);
+}
+/* info */
+.info {
+    display: flex;
+    flex-direction: column; /* One column, two rows */
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    align-items: center; /* Center spans horizontally */
+}
+
+.info span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+/* Button Group */
+.button-group {
+    display: flex;
+    gap: 5rem; /* 5rem gap between buttons */
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.button {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    border: 2px solid ;
+    transition: var(--transition);
+    display: flex; 
+    align-items: center;
+    gap: 0.5rem; 
+    box-shadow: #2ecc71;
+}
+.button:hover {
+    background-color: var(--secondary-color);
+}
+.button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+/* Skills */
+.skills-grid {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    border: 1px solid blue;
+}
+.skills-container {
+    text-align: center; 
+}
+
+.skill-item {
+    background-color: var(--section-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 0.2px solid white;
+}
+.skill-item h4 {
+    font-family: var(--font-primary);
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    border: 1px solid var(--primary-color);
+
+}
+.skill-tags span {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border:2px solid #1a1a1a;
+    font-size: 0.9rem;
+}
+.skills-summary {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-item .value {
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-family: var(--font-accent);
+}
+
+.summary-item .label {
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.skills-chart {
+    max-width: 500px;
+    margin: 2rem auto;
+}
