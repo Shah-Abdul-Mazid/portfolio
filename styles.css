@@ -87,12 +87,11 @@ nav a:hover {
 
 /* ------------------ Responsive Design ------------------------- */
 .container {
-    max-width: 1200px;
+    max-width:0 auto;
     margin: 0 auto;
     padding: 6rem 1.5rem;
 }
 
-/* Main Content Styling */
 main {
     background-color: var(--background-color);
     color: var(--text-color);
@@ -102,9 +101,10 @@ main {
 }
 /* Hero Section */
 .hero {
-    min-height: 80vh;
+    min-height: 90vh;
     background: linear-gradient(to right, var(--section-bg), var(--background-color));
     display: flex;
+    border: 1px solid white;
     align-items: center;
     padding: 2rem 0;
 }
@@ -112,7 +112,7 @@ main {
     display: flex;
     align-items: center;
     gap: 2rem;
-    max-width: 1920px;
+    max-width:fit-content;
     margin: 0 auto;
 }
 
@@ -125,6 +125,20 @@ main {
     max-width: 900px;
     margin: 0 auto;
 }
+.hero-text a {
+    font-size: 1rem;
+    color: var(--text-color);
+    text-decoration: underline;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.hero-text a:hover {
+    font-size: 1rem;
+    color: blue;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
 .hero-text h1 {
     font-family: var(--font-accent);
     justify-content: center;
