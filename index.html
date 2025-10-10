@@ -1,290 +1,603 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>Shah Abdul Mazid - Portfolio</title>
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Shah Abdul Mazid Portfolio</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
 </head>
-<body>
-    <div id="header-placeholder"></div>
-        <main class="container">
 
-            <section id="home"class ="hero">
-                <div class="hero-content">
-                    <div class="hero-text">
-                        <h1>Shah Abdul Mazid - Portfolio</h1>
-                        <h2>AI & Machine Learning Engineer | Data Scientist</h2>
-                        <p>Welcome to my portfolio! I'm passionate about building intelligent systems and leveraging data to solve real-world problems.</p>
-                        <p>Explore my projects and skills in AI, machine learning, and data science.</p>
-                        <div class="info">
-                        <span>
-                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor">
-                                <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zM12 11.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z"/>
-                            </svg>
-                            Dhaka, Bangladesh
-                        </span>
-                        <span>
-                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor">
-                                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                            </svg>
-                            shahabdulmazid.ezan@yahoo.com
-                        </span>
-                        </div>
-                        <div class="button-group">
-                            <a href="https://www.linkedin.com/in/shahabdulmazid/" target="_blank" rel="noopener noreferrer" class="button" aria-label="LinkedIn Profile">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                                    <rect width="4" height="12" x="2" y="9"></rect>
-                                    <circle cx="4" cy="4" r="2"></circle>
-                                </svg>
-                                LinkedIn
-                            </a>
-                            <a href="https://github.com/shah-abdul-mazid" target="_blank" rel="noopener noreferrer" class="button" aria-label="GitHub Profile">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
-                                    <path d="M9 18c-4.51 2-5-2-7-2"></path>
-                                </svg>
-                                GitHub
-                            </a>
-                        </div>
-                    </div>
-                    <div class="profile-image">
-                        <img src="image.jpg" alt="Portrait of Shah Abdul Mazid, AI and Machine Learning Engineer" />
-                    </div>
-                </div>
-            </section>
+<body class="index-page">
 
-            <section id="about"class ="hero">
-                <div class="hero-content">
-                    <div class="hero-text">
-                        <h2>About Me</h2>
-                        <p>
-                            I am Shah Abdul Mazid, a driven Computer Science and Engineering student at East West University in Dhaka,
-                            Bangladesh, born on June 1, 2001. Residing at 14/14, Block-C, Tajmohol Road, Mohammadpur Housing, 
-                            Mohammadpur, Dhaka 1207, I am pursuing my BSc in CSE with an expected graduation in 2026. 
-                            I earned an HSC from Dhaka Ideal College in 2020 with a CGPA of 4.08 out of 5. My passion for technology
-                            fuels my pursuit of innovative solutions in Machine Learning, Artificial Intelligence, and Data Science.
-                        </p>
-                        <p >
-                            Proficient in programming languages such as Python, JavaScript, Java, C++, R, SQL, and MySQL, and skilled in AI/ML frameworks like TensorFlow and PyTorch, I excel in developing real-time machine learning models and conducting cutting-edge AI research. My portfolio, showcased on GitHub, features projects like a real-time image classification model and a predictive analytics system, demonstrating my ability to solve complex real-world problems through data-driven approaches.
-                        </p>
-                        <p>
-                            As an active participant in hackathons, coding competitions, and problem-solving initiatives, I leverage my expertise in ML, AI, and Data Science to tackle challenging datasets and develop impactful solutions. My achievements include winning the XYZ Hackathon, publishing AI research in the XYZ Journal, earning the Best Project Award at ABC Tech Fest, and consistent recognition on the Dean’s List for Academic Excellence.
-                        </p>
-                        <p >
-                            Committed to advancing the tech community, I volunteer as a mentor to guide junior students in their academic and career journeys. My goal is to harness AI and machine learning to create intelligent systems that address global challenges, driving innovation and delivering meaningful impact.
-                        </p>
-                    </div>
-                </div>
-            </section>
+  <header id="header" class="header dark-background d-flex flex-column">
+    <i class="header-toggle d-xl-none bi bi-list"></i>
 
-            <section id="skills" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">
-                        <h2>Technical Skills</h2>
-                        <p>A comprehensive overview of my technical expertise spanning multiple domains including AI/ML, software development, and various programming languages.</p>
-                        <div class="skills-container">
-                            <div class="skills-grid">
-                                <div class="skill-item">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white" aria-label="Code Icon">
-                                            <path d="m16 18 6-6-6-6"></path>
-                                            <path d="m8 6-6 6 6 6"></path>
-                                        </svg>
-                                        <h4>Languages</h4>
-                                    </div>
-                                    <div class="skill-tags">
-                                        <span>Python</span>
-                                        <span>JavaScript</span>
-                                        <span>Java</span>
-                                        <span>C++</span>
-                                        <span>R</span>
-                                        <span>SQL</span>
-                                        <span>C Programming</span>
-                                        <span>MySQL</span>
-                                    </div>
-                                </div>
-                                <div class="skill-item">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400" aria-label="AI Brain Icon">
-                                            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
-                                            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
-                                            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path>
-                                            <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path>
-                                            <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path>
-                                            <path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path>
-                                            <path d="M19.938 10.5a4 4 0 0 1 .585.396"></path>
-                                            <path d="M6 18a4 4 0 0 1-1.967-.516"></path>
-                                            <path d="M19.967 17.484A4 4 0 0 1 18 18"></path>
-                                        </svg>
-                                        <h4>AI/ML & Data Science</h4>
-                                    </div>
-                                    <div class="skill-tags">
-                                        <span>TensorFlow</span>
-                                        <span>PyTorch</span>
-                                        <span>Scikit-learn</span>
-                                        <span>OpenCV</span>
-                                        <span>NumPy</span>
-                                        <span>Pandas</span>
-                                        <span>Matplotlib</span>
-                                        <span>Seaborn</span>
-                                        <span>Streamlit</span>
-                                        <span>MLflow</span>
-                                        <span>Natural Language Processing</span>
-                                        <span>Computer Vision</span>
-                                        <span>Deep Learning</span>
-                                        <span>Reinforcement Learning</span>
-                                        <span>Feature Engineering</span>
-                                        <span>Model Evaluation</span>
-                                        <span>MLOps</span>
-                                        <span>Data Analysis</span>
-                                        <span>Data Visualization</span>
-                                        <span>Image Processing</span>
-                                        <span>Real-Time ML Model Development</span>
-                                        <span>AI Research</span>
-                                    </div>
-                                </div>
-                                <div class="skill-item">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400" aria-label="Server Icon">
-                                            <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
-                                            <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
-                                            <line x1="6" x2="6.01" y1="6" y2="6"></line>
-                                            <line x1="6" x2="6.01" y1="18" y2="18"></line>
-                                        </svg>
-                                        <h4>Software Development</h4>
-                                    </div>
-                                    <div class="skill-tags">
-                                        <span>Node.js</span>
-                                        <span>Express</span>
-                                        <span>React</span>
-                                        <span>Next.js</span>
-                                        <span>Spring Boot</span>
-                                        <span>FastAPI</span>
-                                        <span>Flask</span>
-                                        <span>Django</span>
-                                        <span>MongoDB</span>
-                                        <span>Redis</span>
-                                        <span>Docker</span>
-                                        <span>AWS</span>
-                                        <span>Azure</span>
-                                        <span>Google Cloud Platform</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="skills-summary">
-                                <div class="summary-item">
-                                    <div class="value">8</div>
-                                    <div class="label">Programming Languages</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="value">22</div>
-                                    <div class="label">AI/ML Technologies</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="value">14</div>
-                                    <div class="label">Development Tools</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+    <div class="profile-img">
+      <img src="assets/img/my-profile-img.jpg" alt="" class="img-fluid rounded-circle">
+    </div>
 
-            <section id="experience" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Experience</h2>
-                        <p>Software Engineer at Tech Corp, 2020-2023: Developed scalable web applications using React and Node.js.</p>
-                        <p>Freelance Developer, 2018-2020: Built custom websites for small businesses, enhancing their online presence.</p>
-                    </div>
-                </div>
-            </section>
+    <a href="index.html" class="logo d-flex align-items-center justify-content-center">
+      <!-- Uncomment the line below if you also wish to use an image logo -->
+      <!-- <img src="assets/img/logo.png" alt=""> -->
+      <h1 class="sitename">Shah Abdul Mazid</h1>
+    </a>
 
-            <section id="education" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Education</h2>
-                        <p>B.S. in Computer Science, University of Technology, 2014-2018: Graduated with honors, focusing on algorithms.</p>
-                        <p>Online Course in Data Science, Coursera, 2019: Mastered machine learning and data analysis techniques.</p>
-                    </div>
-                </div>
-            </section>
+    <div class="social-links text-center">
+      <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+      <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+      <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+      <a href="#" class="google-plus"><i class="bi bi-skype"></i></a>
+      <a href="https://www.linkedin.com/in/shahabdulmazid" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      <a href="https://github.com/Shah-Abdul-Mazid" class="github"><i class="bi bi-github"></i></a>
+    </div>
 
-            <section id="certifications" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Certifications</h2>
-                        <p>AWS Certified Solutions Architect, 2021: Demonstrated expertise in cloud infrastructure design.</p>
-                        <p>Certified ScrumMaster, 2020: Led agile teams to deliver projects efficiently.</p>
-                    </div>
-                </div>
-            </section>
+    <nav id="navmenu" class="navmenu">
+      <ul>
+        <li><a href="#hero" class="active"><i class="bi bi-house navicon"></i>Home</a></li>
+        <li><a href="#about"><i class="bi bi-person navicon"></i> About</a></li>
+        <li><a href="#resume"><i class="bi bi-file-earmark-text navicon"></i> Resume</a></li>
+        <li><a href="#contact"><i class="bi bi-envelope navicon"></i> Contact</a></li>
+      </ul>
+    </nav>
 
-            <section id="achievements" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Achievements</h2>
-                        <p>Won 1st Place in National Hackathon, 2019: Developed an innovative app for real-time collaboration.</p>
-                        <p>Published Open-Source Library, 2022: Created a widely-used tool for simplifying API integrations.</p>
-                    </div>
-                </div>
-            </section>
+  </header>
 
-            <section id="awards" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Awards</h2>
-                        <p>Won 1st Place in National Hackathon, 2019: Developed an innovative app for real-time collaboration.</p>
-                        <p>Received Innovation Award, 2023: Recognized for contributions to scalable cloud solutions.</p>
-                    </div>
-                </div>
-            </section>
+  <main class="main">
 
-            <section id="publications" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Publications</h2>
-                        <p>"Advancements in Web Development," Tech Journal, 2021: Explored modern frameworks and their impact.</p>
-                        <p>"AI in Everyday Applications," Science Mag, 2023: Discussed practical uses of AI in mobile apps.</p>
-                    </div>
-                </div>
-            </section>
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
 
-            <section id="projects" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Projects</h2>
-                        <p>Task Management App, 2022: Built a full-stack app with React and MongoDB for efficient task tracking.</p>
-                        <p>E-commerce Platform, 2023: Developed a scalable online store with secure payment integration.</p>
-                    </div>
-                </div>
-            </section>
+      <img src="assets/img/hero-bg.jpg" alt="" data-aos="fade-in" class="">
 
-            <section id="contact" class="hero">
-                <div class="hero-content">
-                    <div class="hero-text">                
-                        <h2>Contact Me</h2>
-                        <form class="contact-form">
-                            <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" required>
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
-                            <label for="message">Message:</label>
-                            <textarea id="message" name="message" required></textarea>
-                            <button type="submit">Send Message</button>
-                        </form>
-                        <br/>
-                        <br/>
-                        <br/>
-                        <p>Email: <a href="mailto:shahabdulmazid.ezan@yahoo.com"target="_blank"aria-label="Yahoo Mail">shahabdulmazid.ezan@yahoo.com</a> - Reach out for collaboration or inquiries.</p>
-                        <p>LinkedIn: <a href="https://www.linkedin.com/in/shahabdulmazid/"target="_blank"aria-label="Linkedin Profile">Connect</a> - For professional networking.</p>
-                        <p>GitHub: <a href="https://github.com/shah-abdul-mazid" target="_blank"aria-label="GitHub Profile">View Projects</a> - Explore my open-source work.</p>
-                    </div>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <h2>Shah Abdul Mazid</h2>
+        <p>I'm 
+        <span class="typed" data-typed-items="CSE Engineer, AI Researcher, Data Scientist, Machine Learning Enthusiast">
+            CSE Engineer
+        </span>
+        <span class="typed-cursor typed-cursor--blink" aria-hidden="true"></span>
+        </p>
+      </div>
+
+    </section><!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+            <h2>About</h2>
+            <p>I am a Computer Science and Engineering student majoring in Intelligent Systems and Data Science at East West University. Passionate about building intelligent systems, I focus on Machine Learning, Deep Learning, Computer Vision, and NLP to create impactful solutions. I’m enthusiastic about research, AI innovation, teamwork, and hackathon projects.</p>
+        </div><!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="row gy-4 justify-content-center">
+            <div class="col-lg-4">
+                <img src="assets/img/my-profile-img.jpg" class="img-fluid" alt="My Profile Picture">
+            </div>
+            <div class="col-lg-8 content">
+                <h2>CSE Student (Intelligent Systems & Data Science)</h2>
+                <p class="fst-italic py-3">
+                Skilled in deep learning, computer vision, NLP, and ML deployment with strong analytical and research abilities.
+                </p>
+                <div class="row">
+                <div class="col-lg-6">
+                    <ul>
+                    <li><i class="bi bi-chevron-right"></i> <strong>Birthday:</strong> <span>1 June 2001</span></li>
+                    <li><i class="bi bi-chevron-right"></i> <strong>Website:</strong> <span>www.github.com/Shah-Abdul-Mazid</span></li>
+                    <li><i class="bi bi-chevron-right"></i> <strong>Phone:</strong> <span>+880 1531-329222</span></li>
+                    <li><i class="bi bi-chevron-right"></i> <strong>City:</strong> <span>Dhaka, Bangladesh</span></li>
+                    </ul>
                 </div>
-            </section>
-        </main>
-    <div id="footer-placeholder"></div>
-    <script src="scripts.js"></script>
+                <div class="col-lg-6">
+                    <ul>
+                    <li><i class="bi bi-chevron-right"></i> <strong>Age:</strong> <span>24</span></li>
+                    <li><i class="bi bi-chevron-right"></i> <strong>Degree:</strong> <span>B.Sc. in CSE (Intelligent Systems & Data Science)</span></li>
+                    <li><i class="bi bi-chevron-right"></i> <strong>Email:</strong> <span>shahabdulmazid.ezan@yahoo.com</span></li>
+                    </ul>
+                </div>
+                </div>
+                <p class="py-3">
+                My journey in AI and Data Science revolves around developing intelligent systems that solve real-world problems. With a strong foundation in Computer Science, I aim to contribute to research, innovation, and impactful projects in fields such as healthcare, traffic management, and vehicle detection.
+                </p>
+            </div>
+            </div>
+
+        </div>
+
+    </section><!-- /About Section -->
+
+
+    <!-- Stats Section -->
+    <section id="stats" class="stats section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item">
+              <i class="bi bi-laptop"></i>
+              <span data-purecounter-start="0" data-purecounter-end="5" data-purecounter-duration="1" class="purecounter"></span>
+              <p><strong>Projects</strong> <span>Completed</span></p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item">
+              <i class="bi bi-trophy"></i>
+              <span data-purecounter-start="0" data-purecounter-end="3" data-purecounter-duration="1" class="purecounter"></span>
+              <p><strong>Competitions</strong> <span>Participated</span></p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item">
+              <i class="bi bi-certificate"></i>
+              <span data-purecounter-start="0" data-purecounter-end="4" data-purecounter-duration="1" class="purecounter"></span>
+              <p><strong>Certificates</strong> <span>Earned</span></p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item">
+              <i class="bi bi-clock"></i>
+              <span data-purecounter-start="0" data-purecounter-end="2000" data-purecounter-duration="1" class="purecounter"></span>
+              <p><strong>Hours Coding</strong> <span>Devoted</span></p>
+            </div>
+          </div><!-- End Stats Item -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Stats Section -->
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills section light-background">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Skills</h2>
+        <p>Proficient in programming languages, AI/ML frameworks, data science tools, and development technologies.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row skills-content skills-animation">
+
+          <div class="col-lg-6">
+
+            <div class="progress">
+              <span class="skill"><span>Python</span> <i class="val">95%</i></span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><!-- End Skills Item -->
+
+            <div class="progress">
+              <span class="skill"><span>Java</span> <i class="val">90%</i></span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><!-- End Skills Item -->
+
+            <div class="progress">
+              <span class="skill"><span>PyTorch / TensorFlow</span> <i class="val">85%</i></span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><!-- End Skills Item -->
+
+          </div>
+
+          <div class="col-lg-6">
+
+            <div class="progress">
+              <span class="skill"><span>SQL</span> <i class="val">85%</i></span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><!-- End Skills Item -->
+
+            <div class="progress">
+              <span class="skill"><span>OpenCV / YOLO</span> <i class="val">80%</i></span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><!-- End Skills Item -->
+
+            <div class="progress">
+              <span class="skill"><span>Flask / FastAPI</span> <i class="val">75%</i></span>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><!-- End Skills Item -->
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Skills Section -->
+
+    <!-- Resume Section -->
+    <section id="resume" class="resume section">
+
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+            <h2>Resume</h2>
+            <p>B.Sc. in Computer Science (Intelligent Systems & Data Science) at East West University. Skilled in deep learning, computer vision, NLP, and ML deployment with strong analytical and research abilities. Passionate about AI innovation, teamwork, and hackathon projects.</p>
+        </div><!-- End Section Title -->
+
+        <div class="container">
+
+            <div class="row">
+
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="resume-title">Summary</h3>
+
+                <div class="resume-item pb-0">
+                <h4>Shah Abdul Mazid</h4>
+                <p><em>B.Sc. Student in Computer Science & Engineering (Major: Intelligent Systems & Data Science) at East West University. Skilled in deep learning, computer vision, NLP, and ML deployment with strong analytical and research abilities. Passionate about AI innovation, teamwork, and hackathon projects.</em></p>
+                <ul>
+                    <li>Mohammadpur, Dhaka-1207, Bangladesh</li>
+                    <li>+880 1531-329222</li>
+                    <li>shahabdulmazid.ezan@yahoo.com</li>
+                </ul>
+                </div><!-- End Resume Item -->
+
+                <h3 class="resume-title">Education</h3>
+                <div class="resume-item">
+                <h4>B.Sc. in Computer Science & Engineering</h4>
+                <h5>2021 – 2026</h5>
+                <p><em>Major: Intelligent Systems & Data Science<br>East West University</em></p>
+                <p>CGPA: Enrolled (Exp. June 2026)</p>
+                </div><!-- End Resume Item -->
+
+                <div class="resume-item">
+                <h4>Higher Secondary Certificate (HSC)</h4>
+                <h5>2018 – 2020</h5>
+                <p><em>Science<br>Dhaka Ideal College</em></p>
+                <p>CGPA: 4.08/5.00</p>
+                </div><!-- End Resume Item -->
+
+                <div class="resume-item">
+                <h4>Secondary School Certificate (SSC)</h4>
+                <h5>2016 – 2018</h5>
+                <p><em>Science<br>Badshah Faisal Institute</em></p>
+                <p>CGPA: 4.00/5.00</p>
+                </div><!-- End Resume Item -->
+
+                <h3 class="resume-title">Skills</h3>
+                <div class="resume-item">
+                  <ul>
+                    <li>Programming: Python (Advanced), Java (Advanced), JavaScript (Intermediate), C (Intermediate), R (Intermediate), SQL (Proficient)</li>
+                    <li>AI/ML: TensorFlow, PyTorch, Keras, Scikit-learn, Hugging Face, NLTK, LangChain, OpenCV, YOLO</li>
+                    <li>Data Science: NumPy, Pandas, SciPy, Matplotlib, Seaborn, Jupyter</li>
+                    <li>Development: Flask, FastAPI, Streamlit, Django, Flutter</li>
+                    <li>DevOps: Docker, Git, AWS, GCP</li>
+                  </ul>
+                </div>
+
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="resume-title">Academic, Thesis & Research Projects</h3>
+                <div class="resume-item">
+                <h4>Brain Tumor Classification & Detection Hybrid Model with Attention</h4>
+                <h5>2025 (Running)</h5>
+                <p><em>Capstone Project<br>East West University</em></p>
+                </div><!-- End Resume Item -->
+
+                <div class="resume-item">
+                <h4>Bangladesh Traffic Flow Dataset for YOLO</h4>
+                <h5>2025</h5>
+                <p><em>Research Project<br>East West University</em></p>
+                </div><!-- End Resume Item -->
+
+                <div class="resume-item">
+                <h4>VAID: An Aerial Image Dataset for Vehicle Detection</h4>
+                <h5>2024</h5>
+                <p><em>Research Project<br>East West University</em></p>
+                </div><!-- End Resume Item -->
+
+                <div class="resume-item">
+                <h4>Library Management System</h4>
+                <h5>2023</h5>
+                <p><em>Database Project<br>East West University</em></p>
+                </div><!-- End Resume Item -->
+
+                <div class="resume-item">
+                <h4>Hospital Management System Using Java Swing</h4>
+                <h5>2022</h5>
+                <p><em>Academic Project<br>East West University</em></p>
+                </div><!-- End Resume Item -->
+
+                <h3 class="resume-title">Certificates & Workshops</h3>
+                <div class="resume-item">
+                  <h5>2025 - Basics of Data Visualization using Python, UniAthena</h5>
+                  <h5>2025 - Basic in Machine Learning, UniAthena</h5>
+                  <h5>2021 - Graphic Design Workshop, East West University</h5>
+                  <h5>2021 - MS Excel Advance Workshop, East West University</h5>
+                </div>
+
+                <h3 class="resume-title">Hackathons / Competitions</h3>
+                <div class="resume-item">
+                  <h5>2024 - Network War, East West University Telecommunication Club</h5>
+                  <h5>2024 - IT Olympiad of CSE FEST 2024, East West University</h5>
+                  <h5>2022 - In House Programming Battle, East West University</h5>
+                </div>
+
+            </div>
+
+            </div>
+
+        </div>
+
+    </section><!-- /Resume Section -->
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials section light-background">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Testimonials</h2>
+        <p>Feedback from references and collaborators.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="swiper init-swiper">
+          <script type="application/json" class="swiper-config">
+            {
+              "loop": true,
+              "speed": 600,
+              "autoplay": {
+                "delay": 5000
+              },
+              "slidesPerView": "auto",
+              "pagination": {
+                "el": ".swiper-pagination",
+                "type": "bullets",
+                "clickable": true
+              },
+              "breakpoints": {
+                "320": {
+                  "slidesPerView": 1,
+                  "spaceBetween": 40
+                },
+                "1200": {
+                  "slidesPerView": 3,
+                  "spaceBetween": 1
+                }
+              }
+            }
+          </script>
+          <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  <span>Shah Abdul Mazid is a dedicated and talented student with exceptional skills in AI and machine learning. Highly recommended for any research or development role.</span>
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+                <img src="assets/img/testimonials/testimonials-1.jpg" class="testimonial-img" alt="">
+                <h3>Shahria Mosi Faria</h3>
+                <h4>Associate Officer, IFIC Bank</h4>
+              </div>
+            </div><!-- End testimonial item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  <span>Export tempor illum tamen malis malis eram quae irure esse labore quem cillum quid malis quorum velit fore eram velit sunt aliqua noster fugiat irure amet legam anim culpa.</span>
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+                <img src="assets/img/testimonials/testimonials-2.jpg" class="testimonial-img" alt="">
+                <h3>Sara Wilsson</h3>
+                <h4>Designer</h4>
+              </div>
+            </div><!-- End testimonial item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  <span>Enim nisi quem export duis labore cillum quae magna enim sint quorum nulla quem veniam duis minim tempor labore quem eram duis noster aute amet eram fore quis sint minim.</span>
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+                <img src="assets/img/testimonials/testimonials-3.jpg" class="testimonial-img" alt="">
+                <h3>Jena Karlis</h3>
+                <h4>Store Owner</h4>
+              </div>
+            </div><!-- End testimonial item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  <span>Fugiat enim eram quae cillum dolore dolor amet nulla culpa multos export minim fugiat dolor enim duis veniam ipsum anim magna sunt elit fore quem dolore labore illum veniam.</span>
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+                <img src="assets/img/testimonials/testimonials-4.jpg" class="testimonial-img" alt="">
+                <h3>Matt Brandon</h3>
+                <h4>Freelancer</h4>
+              </div>
+            </div><!-- End testimonial item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  <span>Quis quorum aliqua sint quem legam fore sunt eram irure aliqua veniam tempor noster veniam sunt culpa nulla illum cillum fugiat legam esse veniam culpa fore nisi cillum quid.</span>
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+                <img src="assets/img/testimonials/testimonials-5.jpg" class="testimonial-img" alt="">
+                <h3>John Larson</h3>
+                <h4>Entrepreneur</h4>
+              </div>
+            </div><!-- End testimonial item -->
+
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+
+      </div>
+
+    </section><!-- /Testimonials Section -->
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Contact</h2>
+        <p>Get in touch for collaborations or inquiries.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-5">
+
+            <div class="info-wrap">
+              <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
+                <i class="bi bi-geo-alt flex-shrink-0"></i>
+                <div>
+                  <h3>Address</h3>
+                  <p>Mohammadpur, Dhaka-1207, Bangladesh</p>
+                </div>
+              </div><!-- End Info Item -->
+
+              <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+                <i class="bi bi-telephone flex-shrink-0"></i>
+                <div>
+                  <h3>Phone</h3>
+                  <p>+880 1531-329222</p>
+                </div>
+              </div><!-- End Info Item -->
+
+              <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+                <i class="bi bi-envelope flex-shrink-0"></i>
+                <div>
+                  <h3>Email</h3>
+                  <p>shahabdulmazid.ezan@yahoo.com</p>
+                </div>
+              </div><!-- End Info Item -->
+
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.8410571999997!2d90.360000014778!3d23.747900979597!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c0f3b4b4b4b5%3A0x1a2b3c4d5e6f7g8h!2sMohammadpur%2C%20Dhaka%2C%20Bangladesh!5e0!3m2!1sen!2sus!4v1728569600000!5m2!1sen!2sus" frameborder="0" style="border:0; width: 100%; height: 270px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+              <div class="row gy-4">
+
+                <div class="col-md-6">
+                  <label for="name-field" class="pb-2">Your Name</label>
+                  <input type="text" name="name" id="name-field" class="form-control" required="">
+                </div>
+
+                <div class="col-md-6">
+                  <label for="email-field" class="pb-2">Your Email</label>
+                  <input type="email" class="form-control" name="email" id="email-field" required="">
+                </div>
+
+                <div class="col-md-12">
+                  <label for="subject-field" class="pb-2">Subject</label>
+                  <input type="text" class="form-control" name="subject" id="subject-field" required="">
+                </div>
+
+                <div class="col-md-12">
+                  <label for="message-field" class="pb-2">Message</label>
+                  <textarea class="form-control" name="message" rows="10" id="message-field" required=""></textarea>
+                </div>
+
+                <div class="col-md-12 text-center">
+                  <div class="loading">Loading</div>
+                  <div class="error-message"></div>
+                  <div class="sent-message">Your message has been sent. Thank you!</div>
+
+                  <button type="submit">Send Message</button>
+                </div>
+
+              </div>
+            </form>
+          </div><!-- End Contact Form -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Contact Section -->
+
+  </main>
+
+  <footer id="footer" class="footer position-relative light-background">
+
+    <div class="container">
+      <div class="copyright text-center ">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">Shah Abdul Mazid</strong> <span>All Rights Reserved</span></p>
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you've purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/typed.js/typed.umd.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
 </body>
+
 </html>
