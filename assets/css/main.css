@@ -1029,7 +1029,7 @@ section,
 .skills .section-title h2 {
   font-size: 48px;
   font-weight: 700;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   line-height: 1.2;
   color: var(--heading-color);
 }
@@ -1038,7 +1038,7 @@ section,
   font-size: 20px;
   color: var(--default-color);
   max-width: 700px;
-  margin: 0 auto 40px auto;
+  margin: 0 auto 30px auto;
 }
 
 .skill-section {
