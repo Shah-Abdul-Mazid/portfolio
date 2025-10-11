@@ -1016,7 +1016,7 @@ section,
 --------------------------------------------------------------*/
 .skills {
   min-height: 100vh;
-  padding: 80px 40px;
+  padding: 60px 30px;
   position: relative;
   background-color: var(--background-color);
   display: flex;
