@@ -545,7 +545,7 @@ section,
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit:calc();
   z-index: 1;
 }
 
@@ -564,21 +564,25 @@ section,
 }
 
 .home h2 {
-  margin: 0 0 20px 0;
-  font-size: 64px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--heading-color);
+  letter-spacing: 5px;
+  margin: 0 0 40px 0;
+  font-size: 75px;
+  font-weight: 800;
+  line-height: 2;
+  color: #00008b;
 }
 
 .home p {
   margin: 0;
-  font-size: 26px;
+  font-size: 50px;
+  font-weight: 500;
+  color: #0000ff;
 }
 
 .home p span {
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   border-bottom: 2px solid var(--accent-color);
+  padding-bottom: 5px;
 }
 
 .home .social-links {
@@ -782,7 +786,7 @@ section,
 --------------------------------------------------------------*/
 .projects {
   min-height: 100vh; /* Full viewport height */
-  padding: 80px 40px;
+  padding: 60px 30px;
   position: relative;
   background-color: var(--background-color);
   display: flex;
@@ -1127,14 +1131,13 @@ section,
 /*--------------------------------------------------------------
 # Hackathons & Competitions Section
 --------------------------------------------------------------*/
+
 .hackathons {
   min-height: 100vh;
   padding: 80px 40px;
-  position: relative;
   background-color: var(--background-color);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
 }
@@ -1143,7 +1146,6 @@ section,
   font-size: 48px;
   font-weight: 700;
   margin-bottom: 40px;
-  line-height: 1.2;
   color: var(--heading-color);
 }
 
@@ -1151,13 +1153,13 @@ section,
   display: flex;
   flex-direction: column;
   gap: 50px;
-  position: relative;
-  max-width: 700px;
+  max-width: 800px;
+  width: 100%;
 }
 
 .hackathon-item {
   position: relative;
-  padding-left: 50px; /* timeline spacing */
+  padding-left: 50px;
   text-align: left;
 }
 
@@ -1165,9 +1167,9 @@ section,
   content: "";
   position: absolute;
   left: 0;
-  top: 0;
-  width: 20px;
-  height: 20px;
+  top: 10px;
+  width: 18px;
+  height: 18px;
   background-color: var(--accent-color);
   border-radius: 50%;
 }
@@ -1175,31 +1177,105 @@ section,
 .hackathon-item:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: 9px; /* align with dot */
-  top: 20px;
+  left: 8px;
+  top: 28px;
   width: 2px;
-  height: calc(100% - 20px);
+  height: calc(100% - 28px);
   background-color: var(--accent-color);
 }
 
 .hackathon-item h4 {
   font-size: 24px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--heading-color);
 }
 
 .hackathon-item h5 {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 16px;
   color: rgba(39, 40, 41, 0.6);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .hackathon-item p {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--default-color);
-  margin: 0;
+  margin-bottom: 15px;
+}
+
+/* Certificate Image */
+.certificate-img {
+  display: block;
+  margin: 10px auto 0;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 10px;
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.certificate-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/*--------------------------------------------------------------
+# Fullscreen Image Modal (Pure CSS)
+--------------------------------------------------------------*/
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  justify-content: center;
+  align-items: center;
+}
+
+.image-modal img {
+  max-width: 90%;
+  max-height: 85vh;
+  border-radius: 10px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+  animation: zoomIn 0.3s ease;
+}
+
+/* When image is clicked (using :target) */
+.image-modal:target {
+  display: flex;
+}
+
+/* Close Button */
+.image-modal .close {
+  position: absolute;
+  top: 30px;
+  right: 50px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.image-modal .close:hover {
+  color: var(--accent-color);
+}
+
+/* Animation */
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Responsive */
@@ -1209,33 +1285,30 @@ section,
   }
 
   .hackathon-item {
-    padding-left: 30px;
+    padding-left: 35px;
   }
 
   .hackathon-item::before {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   .hackathon-item:not(:last-child)::after {
-    left: 7px;
+    left: 6px;
   }
 
   .hackathons .section-title h2 {
     font-size: 32px;
-    margin-bottom: 30px;
   }
 
-  .hackathon-item h4 {
-    font-size: 20px;
+  .certificate-img {
+    max-width: 100%;
   }
 
-  .hackathon-item h5 {
-    font-size: 14px;
-  }
-
-  .hackathon-item p {
-    font-size: 14px;
+  .image-modal .close {
+    top: 20px;
+    right: 25px;
+    font-size: 35px;
   }
 }
 
