@@ -1412,10 +1412,16 @@ section,
 /*--------------------------------------------------------------
 # Contact Section
 --------------------------------------------------------------*/
+.contact {
+  padding: 80px 0;
+  background: var(--background-color);
+}
+
 .contact .info-wrap {
   background-color: var(--surface-color);
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 30px;
+  border-radius: 10px;
 }
 
 @media (max-width: 575px) {
@@ -1425,34 +1431,35 @@ section,
 }
 
 .contact .info-item {
-  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .contact .info-item i {
-  font-size: 20px;
+  font-size: 22px;
   color: var(--accent-color);
-  background: color-mix(in srgb, var(--accent-color), transparent 92%);
+  background: color-mix(in srgb, var(--accent-color), transparent 90%);
   width: 44px;
   height: 44px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50px;
-  transition: all 0.3s ease-in-out;
+  border-radius: 50%;
   margin-right: 15px;
+  transition: all 0.3s ease-in-out;
 }
 
 .contact .info-item h3 {
-  padding: 0;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 5px;
 }
 
 .contact .info-item p {
-  padding: 0;
-  margin-bottom: 0;
+  margin: 0;
   font-size: 14px;
+  color: var(--default-color);
 }
 
 .contact .info-item:hover i {
@@ -1464,6 +1471,7 @@ section,
   background-color: var(--surface-color);
   height: 100%;
   padding: 30px;
+  border-radius: 10px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -1476,23 +1484,24 @@ section,
 .contact .php-email-form input[type=text],
 .contact .php-email-form input[type=email],
 .contact .php-email-form textarea {
+  width: 100%;
   font-size: 14px;
   padding: 10px 15px;
-  box-shadow: none;
-  border-radius: 0;
   color: var(--default-color);
   background-color: var(--surface-color);
-  border-color: color-mix(in srgb, var(--default-color), transparent 80%);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
 }
 
 .contact .php-email-form input[type=text]:focus,
 .contact .php-email-form input[type=email]:focus,
 .contact .php-email-form textarea:focus {
   border-color: var(--accent-color);
+  outline: none;
 }
 
-.contact .php-email-form input[type=text]::placeholder,
-.contact .php-email-form input[type=email]::placeholder,
+.contact .php-email-form input::placeholder,
 .contact .php-email-form textarea::placeholder {
   color: color-mix(in srgb, var(--default-color), transparent 70%);
 }
@@ -1500,19 +1509,23 @@ section,
 .contact .php-email-form button[type=submit] {
   color: var(--contrast-color);
   background: var(--accent-color);
-  border: 0;
-  padding: 10px 30px;
+  border: none;
+  padding: 12px 35px;
   transition: 0.4s;
   border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .contact .php-email-form button[type=submit]:hover {
   background: color-mix(in srgb, var(--accent-color), transparent 25%);
 }
+
 .contact .php-email-form button[type=submit]:focus {
   outline: none;
   box-shadow: none;
 }
+
 .contact .php-email-form .loading,
 .contact .php-email-form .error-message,
 .contact .php-email-form .sent-message {
@@ -1520,6 +1533,7 @@ section,
   text-align: center;
   font-weight: 600;
 }
+
 .contact .php-email-form .loading {
   background: var(--surface-color);
   padding: 15px;
@@ -1527,20 +1541,23 @@ section,
 }
 
 /*--------------------------------------------------------------
-Footer
+# Footer Section
 --------------------------------------------------------------*/
-
 .footer {
   background: #0d0d0d; /* deep dark background */
   color: #f8f9fa;
-  padding: 20px 0;
+  text-align: center;
+  padding: 25px 0;
+  margin-top: 60px;
 }
 
 .footer-text {
   color: #ddd;
-  font-size: 18px; /* increased font size */
+  font-size: 18px;
   letter-spacing: 0.3px;
+  margin-bottom: 10px;
 }
+
 .highlight {
   color: #ffc107;
   font-weight: 600;
@@ -1548,10 +1565,17 @@ Footer
 
 .footer .social-links a {
   color: #f8f9fa;
+  font-size: 20px;
+  margin: 0 8px;
   transition: color 0.3s, transform 0.3s;
 }
 
 .footer .social-links a:hover {
   color: #ffc107;
   transform: scale(1.15);
+}
+
+/* Optional — Footer stays above all content */
+.footer a {
+  text-decoration: none;
 }
