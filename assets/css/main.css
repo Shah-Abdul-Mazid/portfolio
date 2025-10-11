@@ -1413,7 +1413,7 @@ section,
 # Contact Section
 --------------------------------------------------------------*/
 .contact {
-  min-height: 100vh;
+  min-height: 70vh;
   padding: 10px 5px;
   background-color: var(--background-color);
   display: flex;
@@ -1547,9 +1547,6 @@ section,
 # Footer Section
 --------------------------------------------------------------*/
 .footer {
-  max-height: 100vh;
-  width: 100%;
-  margin: 0 auto ;
   background: #0d0d0d; /* deep dark background */
   color: #f8f9fa;
   text-align: center;
