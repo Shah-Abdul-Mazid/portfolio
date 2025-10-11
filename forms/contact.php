@@ -1,41 +1,61 @@
 <?php
-  /**
-  * Requires the "PHP Email Form" library
-  * The "PHP Email Form" library is available only in the pro version of the template
-  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
-  * For more info and help: https://bootstrapmade.com/php-email-form/
-  */
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'contact@example.com';
+// Include PHPMailer
+require '../assets/phpmailer/src/Exception.php';
+require '../assets/phpmailer/src/PHPMailer.php';
+require '../assets/phpmailer/src/SMTP.php';
 
-  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
-    include( $php_email_form );
-  } else {
-    die( 'Unable to load the "PHP Email Form" Library!');
-  }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // Collect and sanitize form data
+    $name    = htmlspecialchars($_POST['name']);
+    $email   = htmlspecialchars($_POST['email']);
+    $subject = htmlspecialchars($_POST['subject']);
+    $message = htmlspecialchars($_POST['message']);
 
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
+    // Basic validation
+    if(empty($name) || empty($email) || empty($subject) || empty($message)){
+        die("Please fill in all required fields.");
+    }
 
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'example.com',
-    'username' => 'example',
-    'password' => 'pass',
-    'port' => '587'
-  );
-  */
+    if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        die("Invalid email format.");
+    }
 
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
+    $mail = new PHPMailer(true);
 
-  echo $contact->send();
+    try {
+        // SMTP settings for Yahoo
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.mail.yahoo.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'shahabdulmazid.ezan@yahoo.com'; // your Yahoo email
+        $mail->Password   = 'Ilovepopy2023@02@126';       // Yahoo App Password
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port       = 465;
+
+        // Email sender & recipient
+        $mail->setFrom($email, $name);
+        $mail->addAddress('shahabdulmazid.ezan@yahoo.com', 'Shah Abdul Mazid');
+
+        // Email content
+        $mail->isHTML(true);
+        $mail->Subject = "New Contact Message: $subject";
+        $mail->Body    = "
+            <h3>New Message from Website</h3>
+            <p><strong>Name:</strong> $name</p>
+            <p><strong>Email:</strong> $email</p>
+            <p><strong>Subject:</strong> $subject</p>
+            <p><strong>Message:</strong><br>$message</p>
+        ";
+
+        // Send email
+        $mail->send();
+        echo "✅ Message sent successfully!";
+    } catch (Exception $e) {
+        echo "❌ Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+}
 ?>
