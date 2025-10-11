@@ -1547,6 +1547,9 @@ section,
 # Footer Section
 --------------------------------------------------------------*/
 .footer {
+  max-height: 100vh;
+  width: 100%;
+  margin: 0 auto ;
   background: #0d0d0d; /* deep dark background */
   color: #f8f9fa;
   text-align: center;
