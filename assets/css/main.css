@@ -1415,7 +1415,7 @@ section,
 .contact .info-wrap {
   background-color: var(--surface-color);
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-  padding: 30px;
+  padding: 20px;
 }
 
 @media (max-width: 575px) {
@@ -1533,7 +1533,7 @@ Footer
 .footer {
   background: #0d0d0d; /* deep dark background */
   color: #f8f9fa;
-  padding: 25px 0;
+  padding: 20px 0;
 }
 
 .footer-text {
