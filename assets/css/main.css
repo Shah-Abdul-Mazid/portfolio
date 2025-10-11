@@ -1413,6 +1413,7 @@ section,
 # Contact Section
 --------------------------------------------------------------*/
 .contact {
+  min-height: 70vh;
   padding: 60px 30px;
   background-color: var(--background-color);
   display: flex;
