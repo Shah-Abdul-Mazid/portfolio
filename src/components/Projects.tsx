@@ -32,7 +32,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
     return (
         <section id="projects" className="section alt-bg" style={{ overflow: 'hidden' }}>
             <div className="container" style={{ maxWidth: '100%', padding: '0' }}>
-                <div className="section-title fade-in" ref={addToRefs} style={{ paddingLeft: '24px', textAlign: 'center' }}>
+                <div className="section-title fade-in" ref={addToRefs} style={{ textAlign: 'center' }}>
                     <span className="subtitle">Projects</span>
                     <h2>Featured <span className="gradient-text">Projects</span></h2>
                 </div>
@@ -188,7 +188,16 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     .project-slide { width: 90%; }
                     .project-slide.prev, .project-slide.next { display: none !important; }
                     .project-title-gradient { font-size: 2rem; }
-                    .project-card { padding: 40px 30px; }
+                    .project-card { padding: 40px 30px; border-radius: 30px; }
+                    .project-desc { font-size: 1rem; margin-bottom: 30px; }
+                }
+
+                @media (max-width: 480px) {
+                    .slider-container { height: 450px; perspective: none; }
+                    .project-slide { width: 100%; transition: opacity 0.4s ease; transform: none !important; position: static; opacity: 1; display: none; }
+                    .project-slide.active { display: block; }
+                    .project-title-gradient { font-size: 1.75rem; }
+                    .tag-outline { padding: 8px 16px; font-size: 0.75rem; }
                 }
             `}</style>
         </section>

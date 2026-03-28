@@ -13,8 +13,9 @@
     --glow-spot: radial-gradient(circle at center, rgba(139, 92, 246, 0.15), transparent 70%);
 
     /* Spacing */
-    --container-width: 1100px;
-    --section-padding: 100px 0;
+    --container-width: 1200px;
+    --section-padding: clamp(60px, 10vh, 120px) 0;
+    --touch-target: 48px;
 
     /* Transition */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -37,6 +38,20 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
 }
 
 html {

@@ -9,10 +9,26 @@ import Blog from '../components/Blog';
 import WorkExperience from '../components/WorkExperience';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
+import FloatingContactForm from '../components/FloatingContactForm';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Portfolio = () => {
     const { addToRefs } = useIntersectionObserver();
+    const location = useLocation();
+    
+    useEffect(() => {
+        const path = location.pathname.replace('/', '');
+        if (path) {
+            const element = document.getElementById(path);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [location]);
 
     return (
         <div className="app">
@@ -35,6 +51,7 @@ const Portfolio = () => {
                 <Contact addToRefs={addToRefs} />
             </main>
             <Footer />
+            <FloatingContactForm />
         </div>
     );
 };
