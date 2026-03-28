@@ -71,11 +71,21 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 .work-details li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
 
                 @media (max-width: 768px) {
-                    .work-item { gap: 20px; }
+                    .work-item { gap: 16px; }
                     .work-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-                    .work-title-group h3 { font-size: 1.25rem; }
-                    .work-content { padding: 24px; }
+                    .work-title-group h3 { font-size: 1.125rem; }
+                    .work-content { padding: 20px; }
                     .work-time-info { align-items: flex-start; }
+                }
+                @media (max-width: 480px) {
+                    .work-timeline { padding-top: 10px; }
+                    .work-marker { width: 14px; }
+                    .marker-dot { width: 12px; height: 12px; }
+                    .work-item { gap: 12px; margin-bottom: 40px; }
+                    .work-content { padding: 18px 16px; border-radius: 18px; }
+                    .work-details li { font-size: 0.875rem; padding-left: 20px; }
+                    .work-period { font-size: 0.75rem; padding: 5px 10px; }
+                    .company-name { font-size: 0.95rem; }
                 }
             `}</style>
         </section>

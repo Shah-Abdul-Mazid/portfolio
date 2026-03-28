@@ -35,28 +35,35 @@ const Skills = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                 }
                 .skills-marquee { 
                     display: flex; 
-                    gap: 40px; 
+                    gap: 24px; 
                     animation: slide 40s linear infinite; 
                     width: max-content;
                 }
                 .skills-group { 
                     background: var(--card-bg); 
                     border: 1px solid var(--border-color); 
-                    padding: 40px; 
-                    border-radius: 32px; 
-                    min-width: 320px;
+                    padding: 32px; 
+                    border-radius: 28px; 
+                    min-width: 280px;
+                    max-width: 320px;
                     transition: var(--transition);
                 }
                 .skills-group:hover { border-color: var(--primary); transform: translateY(-10px); }
-                .skills-group h3 { font-size: 1.125rem; color: var(--primary); margin-bottom: 24px; font-weight: 700; }
-                .skill-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-                .skill-list li { color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 8px; }
-                .skill-list li::before { content: '•'; color: var(--primary); font-size: 1.5rem; }
+                .skills-group h3 { font-size: 1rem; color: var(--primary); margin-bottom: 20px; font-weight: 700; }
+                .skill-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+                .skill-list li { color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 8px; font-size: 0.9375rem; }
+                .skill-list li::before { content: '•'; color: var(--primary); font-size: 1.5rem; line-height: 0; }
                 @keyframes slide {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
                 }
                 .skills-marquee:hover { animation-play-state: paused; }
+
+                @media (max-width: 600px) {
+                    .skills-group { min-width: 220px; padding: 24px 20px; border-radius: 20px; }
+                    .skills-marquee { gap: 16px; }
+                    .skills-marquee-container { margin-top: 40px; padding: 30px 0; }
+                }
             `}</style>
         </section>
     );

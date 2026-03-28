@@ -1,100 +1,108 @@
 import express from 'express';
-import pkg from 'pg';
-const { Pool } = pkg;
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import path from 'path';
+
+dotenv.config();
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// PostgreSQL Connection
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'portfolio', // Assumed name
-  password: 'admin',
-  port: 5432,
+// MongoDB Atlas Connection
+const atlasURL = process.env.atlas_URL;
+
+mongoose.connect(atlasURL, { dbName: process.env.atlas_DB_NAME })
+    .then(() => console.log(`✅ Connected to MongoDB Database: ${process.env.atlas_DB_NAME}`))
+    .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
+
+// Error handling for the process
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
 });
 
-// Create table if not exists (Simplified for local setup)
-const initDB = async () => {
-    try {
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL,
-                phone TEXT,
-                query TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS analytics (
-                id TEXT PRIMARY KEY,
-                count INTEGER DEFAULT 0
-            );
-            INSERT INTO analytics (id, count) VALUES ('total_views', 0) ON CONFLICT (id) DO NOTHING;
-        `);
-        console.log('Database initialized successfully.');
-    } catch (err) {
-        console.error('Database initialization failed:', err.message);
-    }
-};
+// Schemas & Models
+const MessageSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String },
+    query: { type: String, required: true },
+    created_at: { type: Date, default: Date.now }
+});
 
-initDB();
+const Message = mongoose.model('Message', MessageSchema, process.env.atlas_COLLECTION_NAME);
+
+const AnalyticsSchema = new mongoose.Schema({
+    id: { type: String, unique: true, required: true },
+    count: { type: Number, default: 0 }
+});
+
+const Analytics = mongoose.model('Analytics', AnalyticsSchema);
 
 // API Endpoints
+// Post message
 app.post('/api/messages', async (req, res) => {
-    const { name, email, phone, query } = req.body;
+    console.log('📩 Incoming message request:', req.body);
     try {
-        const result = await pool.query(
-            'INSERT INTO messages (name, email, phone, query) VALUES ($1, $2, $3, $4) RETURNING *',
-            [name, email, phone, query]
-        );
-        res.status(201).json(result.rows[0]);
+        const newMessage = new Message(req.body);
+        const savedMessage = await newMessage.save();
+        console.log('✅ Message saved to MongoDB:', savedMessage._id);
+        res.status(201).json(savedMessage);
     } catch (err) {
         console.error('Error saving message:', err.message);
         res.status(500).json({ error: 'Failed to save message' });
     }
 });
 
+// Get all messages
 app.get('/api/messages', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
-        res.json(result.rows);
+        const messages = await Message.find().sort({ created_at: -1 });
+        res.json(messages);
     } catch (err) {
         console.error('Error fetching messages:', err.message);
         res.status(500).json({ error: 'Failed to fetch messages' });
     }
 });
 
+// Track page view
 app.post('/api/analytics/track', async (req, res) => {
     try {
-        await pool.query('UPDATE analytics SET count = count + 1 WHERE id = $1', ['total_views']);
-        const result = await pool.query('SELECT count FROM analytics WHERE id = $1', ['total_views']);
-        res.json(result.rows[0]);
+        const result = await Analytics.findOneAndUpdate(
+            { id: 'total_views' },
+            { $inc: { count: 1 } },
+            { upsert: true, new: true }
+        );
+        res.json(result);
     } catch (err) {
         console.error('Error tracking visit:', err.message);
         res.status(500).json({ error: 'Failed to track visit' });
     }
 });
 
+// Get total views
 app.get('/api/analytics', async (req, res) => {
     try {
-        const result = await pool.query('SELECT count FROM analytics WHERE id = $1', ['total_views']);
-        res.json(result.rows[0] || { count: 0 });
+        const result = await Analytics.findOne({ id: 'total_views' });
+        res.json(result || { count: 0 });
     } catch (err) {
         console.error('Error fetching analytics:', err.message);
         res.status(500).json({ error: 'Failed to fetch analytics' });
     }
 });
 
+// Delete a message
 app.delete('/api/messages/:id', async (req, res) => {
     try {
-        await pool.query('DELETE FROM messages WHERE id = $1', [req.params.id]);
+        await Message.findByIdAndDelete(req.params.id);
         res.status(204).send();
     } catch (err) {
         console.error('Error deleting message:', err.message);
@@ -103,5 +111,5 @@ app.delete('/api/messages/:id', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+    console.log(`🚀 Backend server running at http://localhost:${port}`);
 });

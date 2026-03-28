@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { supabase } from '../utils/supabaseClient';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus } from 'lucide-react';
+import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, BlogItem, SkillCategory } from '../context/PortfolioContext';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -24,41 +24,33 @@ const AdminDashboard = () => {
         }
     }, [navigate]);
 
+    // Sync editData when data changes (e.g. on mount)
+    useEffect(() => {
+        setEditData(data);
+    }, [data]);
+
     const fetchRealTimeData = async () => {
         setLoading(true);
         try {
-            // Fetch views from local API
             const viewsRes = await fetch('http://localhost:3001/api/analytics');
             const viewsData = await viewsRes.json();
-            
-            // Fetch messages from local API
             const msgsRes = await fetch('http://localhost:3001/api/messages');
             const msgsData = await msgsRes.json();
-
-            setStats({
-                views: viewsData?.count || 0,
-                messages: msgsData?.length || 0
-            });
+            setStats({ views: viewsData?.count || 0, messages: msgsData?.length || 0 });
             setMessages(msgsData || []);
-        } catch (err) {
-            console.error('Error fetching dashboard data from local API:', err);
+        } catch {
+            // Server not running – silently fail
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteMessage = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this message?')) return;
-        
+        if (!window.confirm('Delete this message?')) return;
         try {
-            const response = await fetch(`http://localhost:3001/api/messages/${id}`, {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error('Failed to delete message');
+            await fetch(`http://localhost:3001/api/messages/${id}`, { method: 'DELETE' });
             fetchRealTimeData();
-        } catch (err) {
-            alert('Failed to delete message from local API');
-        }
+        } catch { alert('Failed to delete message'); }
     };
 
     const handleLogout = () => {
@@ -66,54 +58,125 @@ const AdminDashboard = () => {
         navigate('/login/admin');
     };
 
-    const InstallAppButton = () => {
-        const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-
-        useEffect(() => {
-            const handler = (e: Event) => {
-                e.preventDefault();
-                setDeferredPrompt(e);
-            };
-            window.addEventListener('beforeinstallprompt', handler);
-            return () => window.removeEventListener('beforeinstallprompt', handler);
-        }, []);
-
-        const handleInstall = async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                setDeferredPrompt(null);
-            }
-        };
-
-        if (!deferredPrompt) {
-            return <div className="pwa-badge"><span className="icon">📲</span> App Ready</div>;
-        }
-
-        return (
-            <button onClick={handleInstall} className="pwa-badge install-btn slide-in">
-                <span className="icon">📥</span> Install App
-            </button>
-        );
-    };
-
-    const handleSave = (e?: React.FormEvent) => {
-        if(e) e.preventDefault();
+    const handleSave = () => {
         updateData(editData);
-        setSaveStatus('Modifications saved successfully!');
+        setSaveStatus('Changes saved successfully!');
         setTimeout(() => setSaveStatus(''), 3000);
     };
 
-    const handleAddItem = (category: string, defaultItem: any) => {
-        setEditData(prev => ({
-            ...prev,
-            [category]: [...(prev as any)[category], defaultItem]
-        }));
+    // ── Generic list helpers ──────────────────────────────────────────────────
+    const updateListItem = (key: string, index: number, field: string, value: any) => {
+        setEditData(prev => {
+            const list = [...(prev as any)[key]];
+            list[index] = { ...list[index], [field]: value };
+            return { ...prev, [key]: list };
+        });
     };
+
+    const removeListItem = (key: string, index: number) => {
+        setEditData(prev => {
+            const list = [...(prev as any)[key]];
+            list.splice(index, 1);
+            return { ...prev, [key]: list };
+        });
+    };
+
+    const addListItem = (key: string, template: any) => {
+        setEditData(prev => ({ ...prev, [key]: [...(prev as any)[key], template] }));
+    };
+
+    // ── Work detail helpers ───────────────────────────────────────────────────
+    const updateWorkDetail = (workIndex: number, detailIndex: number, value: string) => {
+        setEditData(prev => {
+            const work = [...prev.work];
+            const details = [...work[workIndex].details];
+            details[detailIndex] = value;
+            work[workIndex] = { ...work[workIndex], details };
+            return { ...prev, work };
+        });
+    };
+    const addWorkDetail = (workIndex: number) => {
+        setEditData(prev => {
+            const work = [...prev.work];
+            work[workIndex] = { ...work[workIndex], details: [...work[workIndex].details, ''] };
+            return { ...prev, work };
+        });
+    };
+    const removeWorkDetail = (workIndex: number, detailIndex: number) => {
+        setEditData(prev => {
+            const work = [...prev.work];
+            const details = work[workIndex].details.filter((_, i) => i !== detailIndex);
+            work[workIndex] = { ...work[workIndex], details };
+            return { ...prev, work };
+        });
+    };
+
+    // ── Skill helpers ─────────────────────────────────────────────────────────
+    const updateSkillItem = (catIndex: number, itemIndex: number, value: string) => {
+        setEditData(prev => {
+            const skills = prev.skills.map((cat, ci) => {
+                if (ci !== catIndex) return cat;
+                const items = cat.items.map((it, ii) => ii === itemIndex ? value : it);
+                return { ...cat, items };
+            });
+            return { ...prev, skills };
+        });
+    };
+    const addSkillItem = (catIndex: number) => {
+        setEditData(prev => {
+            const skills = prev.skills.map((cat, ci) =>
+                ci === catIndex ? { ...cat, items: [...cat.items, ''] } : cat
+            );
+            return { ...prev, skills };
+        });
+    };
+    const removeSkillItem = (catIndex: number, itemIndex: number) => {
+        setEditData(prev => {
+            const skills = prev.skills.map((cat, ci) =>
+                ci === catIndex ? { ...cat, items: cat.items.filter((_, ii) => ii !== itemIndex) } : cat
+            );
+            return { ...prev, skills };
+        });
+    };
+
+    // ── Project tag helpers ───────────────────────────────────────────────────
+    const updateProjectTag = (projIndex: number, tagIndex: number, value: string) => {
+        setEditData(prev => {
+            const projects = prev.projects.map((p, pi) => {
+                if (pi !== projIndex) return p;
+                const tags = p.tags.map((t, ti) => ti === tagIndex ? value : t);
+                return { ...p, tags };
+            });
+            return { ...prev, projects };
+        });
+    };
+
+    const navItems = [
+        { id: 'profile', icon: '🏠', label: 'Intro & Profile' },
+        { id: 'projects', icon: '🚀', label: 'Portfolio' },
+        { id: 'skills', icon: '💻', label: 'Tech Stack' },
+        { id: 'education', icon: '🎓', label: 'Education' },
+        { id: 'work', icon: '💼', label: 'Work History' },
+        { id: 'experience', icon: '🏆', label: 'Achievements' },
+        { id: 'blog', icon: '📝', label: 'Journal' },
+        { id: 'contact', icon: '📞', label: 'Contact Details' },
+    ];
+
+    const SaveBar = () => (
+        <div className="pane-header">
+            <div>
+                <h2 className="pane-title" style={{ textTransform: 'capitalize' }}>
+                    {navItems.find(n => n.id === activeTab)?.label || activeTab}
+                </h2>
+                <p className="pane-desc">Edit and save your content changes.</p>
+            </div>
+            <button onClick={handleSave} className="btn btn-primary">Save Changes</button>
+        </div>
+    );
 
     return (
         <div className="admin-layout">
+            {/* Mobile Header */}
             <div className="admin-mobile-header">
                 <h2>Admin <span className="gradient-text">Panel</span></h2>
                 <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
@@ -121,6 +184,7 @@ const AdminDashboard = () => {
                 </button>
             </div>
 
+            {/* Sidebar */}
             <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header desktop-only">
                     <h2>Admin <span className="gradient-text">Panel</span></h2>
@@ -129,16 +193,10 @@ const AdminDashboard = () => {
 
                 <div className="sidebar-group-title">CONTENT MANAGEMENT</div>
                 <nav className="sidebar-nav primary-nav">
-                    {[
-                        { id: 'profile', icon: '🏠', label: 'Intro & Profile' },
-                        { id: 'projects', icon: '🚀', label: 'Portfolio' },
-                        { id: 'skills', icon: '💻', label: 'Tech Stack' },
-                        { id: 'education', icon: '🎓', label: 'Education' },
-                        { id: 'work', icon: '💼', label: 'Work History' },
-                        { id: 'experience', icon: '🏆', label: 'Achievements' },
-                        { id: 'blog', icon: '📝', label: 'Journal' }
-                    ].map(tab => (
-                        <button key={tab.id} className={`nav-item ${activeTab === tab.id ? 'active' : ''}`} onClick={() => { setActiveTab(tab.id); setIsSidebarOpen(false); }}>
+                    {navItems.map(tab => (
+                        <button key={tab.id}
+                            className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                            onClick={() => { setActiveTab(tab.id); setIsSidebarOpen(false); }}>
                             <span className="icon">{tab.icon}</span> {tab.label}
                         </button>
                     ))}
@@ -146,30 +204,33 @@ const AdminDashboard = () => {
 
                 <div className="sidebar-group-title">SYSTEM ADMINISTRATION</div>
                 <nav className="sidebar-nav">
-                    <button className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }}>
-                        <span className="icon">📊</span> Overview
-                    </button>
-                    <button className={`nav-item ${activeTab === 'messages' ? 'active' : ''}`} onClick={() => { setActiveTab('messages'); setIsSidebarOpen(false); }}>
-                        <span className="icon">✉️</span> Messages {stats.messages > 0 && <span className="count-badge">{stats.messages}</span>}
-                    </button>
-                    <button className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }}>
-                        <span className="icon">⚙️</span> Settings
-                    </button>
+                    {[
+                        { id: 'overview', icon: '📊', label: 'Overview' },
+                        { id: 'messages', icon: '✉️', label: 'Messages', badge: stats.messages },
+                        { id: 'settings', icon: '⚙️', label: 'Settings' },
+                    ].map(tab => (
+                        <button key={tab.id}
+                            className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                            onClick={() => { setActiveTab(tab.id); setIsSidebarOpen(false); }}>
+                            <span className="icon">{tab.icon}</span> {tab.label}
+                            {tab.badge ? <span className="count-badge">{tab.badge}</span> : null}
+                        </button>
+                    ))}
                 </nav>
 
                 <div className="sidebar-footer">
-                    <InstallAppButton />
+                    <div className="pwa-badge"><span className="icon">📲</span> App Ready</div>
                     <button onClick={() => navigate('/')} className="footer-btn"><span className="icon">🌐</span> View Site</button>
                     <button onClick={handleLogout} className="footer-btn danger"><span className="icon">🔓</span> Logout</button>
                 </div>
             </aside>
-            
-            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
 
             <main className="admin-main">
                 <div className="main-content-wrapper fade-in" key={activeTab}>
 
-                    {/* OVERVIEW */}
+                    {/* ── OVERVIEW ─────────────────────────────────────────── */}
                     {activeTab === 'overview' && (
                         <div className="tab-pane">
                             <h2 className="pane-title">System Overview</h2>
@@ -181,7 +242,7 @@ const AdminDashboard = () => {
                                         <p className="stat">{loading ? '...' : stats.views.toLocaleString()}</p>
                                     </div>
                                 </div>
-                                <div className="dashboard-card" onClick={() => setActiveTab('messages')} style={{cursor: 'pointer'}}>
+                                <div className="dashboard-card" onClick={() => setActiveTab('messages')} style={{ cursor: 'pointer' }}>
                                     <div className="card-icon"><Mail size={24} /></div>
                                     <div className="card-info">
                                         <h3>New Messages</h3>
@@ -189,17 +250,17 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="dashboard-card">
-                                    <div className="card-icon"><Eye size={24} style={{color: '#10b981'}} /></div>
+                                    <div className="card-icon"><Eye size={24} style={{ color: '#10b981' }} /></div>
                                     <div className="card-info">
                                         <h3>Health</h3>
-                                        <p className="stat" style={{color: '#10b981'}}>Active</p>
+                                        <p className="stat" style={{ color: '#10b981' }}>Active</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* MESSAGES TAB */}
+                    {/* ── MESSAGES ─────────────────────────────────────────── */}
                     {activeTab === 'messages' && (
                         <div className="tab-pane">
                             <div className="pane-header">
@@ -209,96 +270,396 @@ const AdminDashboard = () => {
                                 </div>
                                 <button onClick={fetchRealTimeData} className="btn btn-secondary">Refresh</button>
                             </div>
-
                             <div className="messages-list">
                                 {messages.length === 0 ? (
-                                    <div className="empty-state">
-                                        <Mail size={48} />
-                                        <p>No messages received yet.</p>
-                                    </div>
-                                ) : (
-                                    messages.map((msg) => (
-                                        <div key={msg.id} className="message-card">
-                                            <div className="message-header">
-                                                <div className="user-info">
-                                                    <div className="avatar">{msg.name.charAt(0)}</div>
-                                                    <div>
-                                                        <h4>{msg.name}</h4>
-                                                        <p className="meta"><Mail size={12} /> {msg.email} {msg.phone && <>• <Phone size={12} /> {msg.phone}</>}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="message-date">
-                                                    <Calendar size={14} /> {new Date(msg.created_at).toLocaleDateString()}
+                                    <div className="empty-state"><Mail size={48} /><p>No messages yet.</p></div>
+                                ) : messages.map((msg) => (
+                                    <div key={msg.id} className="message-card">
+                                        <div className="message-header">
+                                            <div className="user-info">
+                                                <div className="avatar">{msg.name.charAt(0)}</div>
+                                                <div>
+                                                    <h4>{msg.name}</h4>
+                                                    <p className="meta"><Mail size={12} /> {msg.email} {msg.phone && <><Phone size={12} /> {msg.phone}</>}</p>
                                                 </div>
                                             </div>
-                                            <div className="message-body">
-                                                <p>{msg.query}</p>
-                                            </div>
-                                            <div className="message-actions">
-                                                <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-primary">
-                                                    <Reply size={14} /> Reply
-                                                </a>
-                                                <button onClick={() => handleDeleteMessage(msg.id)} className="btn-small btn-danger">
-                                                    <Trash2 size={14} /> Delete
-                                                </button>
-                                            </div>
+                                            <div className="message-date"><Calendar size={14} /> {new Date(msg.created_at).toLocaleDateString()}</div>
                                         </div>
-                                    ))
-                                )}
+                                        <div className="message-body"><p>{msg.query}</p></div>
+                                        <div className="message-actions">
+                                            <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-primary"><Reply size={14} /> Reply</a>
+                                            <button onClick={() => handleDeleteMessage(msg.id)} className="btn-small btn-danger"><Trash2 size={14} /> Delete</button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
 
-                    {/* INTRO & PROFILE (Hero + About) */}
+                    {/* ── INTRO & PROFILE ──────────────────────────────────── */}
                     {activeTab === 'profile' && (
                         <div className="tab-pane cms-pane">
-                            <div className="pane-header">
-                                <div><h2 className="pane-title">Intro & Profile</h2><p className="pane-desc">Manage your core identity, tagline, and biography.</p></div>
-                                <button onClick={() => handleSave()} className="btn btn-primary top-save-btn">Save Changes</button>
-                            </div>
-                            {saveStatus && <div className="status-badge active mb-4">✓ {saveStatus}</div>}
-                            
-                            <div className="cms-form form-section">
-                                <h4>Hero Banner</h4>
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+
+                            <div className="form-section">
+                                <h4 className="section-label">Hero Banner</h4>
                                 <div className="flex-group">
-                                    <div className="w-50 form-group"><label>Display Name</label><input type="text" value={editData.hero.name} onChange={(e) => setEditData({...editData, hero: {...editData.hero, name: e.target.value}})} /></div>
-                                    <div className="w-50 form-group"><label>Primary Tagline</label><input type="text" value={editData.hero.title} onChange={(e) => setEditData({...editData, hero: {...editData.hero, title: e.target.value}})} /></div>
+                                    <div className="form-group w-50">
+                                        <label>Display Name</label>
+                                        <input type="text" value={editData.hero.name}
+                                            onChange={e => setEditData({ ...editData, hero: { ...editData.hero, name: e.target.value } })} />
+                                    </div>
+                                    <div className="form-group w-50">
+                                        <label>Primary Tagline</label>
+                                        <input type="text" value={editData.hero.title}
+                                            onChange={e => setEditData({ ...editData, hero: { ...editData.hero, title: e.target.value } })} />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Description</label>
+                                    <input type="text" value={editData.hero.description}
+                                        onChange={e => setEditData({ ...editData, hero: { ...editData.hero, description: e.target.value } })} />
                                 </div>
                             </div>
 
-                            <div className="cms-form form-section">
-                                <h4>About Me Biography</h4>
-                                <div className="form-group"><label>Bio Paragraphs (Use double line breaks to separate)</label><textarea rows={6} value={editData.about.bio} onChange={(e) => setEditData({...editData, about: {...editData.about, bio: e.target.value}})} /></div>
+                            <div className="form-section">
+                                <h4 className="section-label">About Me Biography</h4>
+                                <div className="form-group">
+                                    <label>Bio (double line breaks = paragraphs)</label>
+                                    <textarea rows={7} value={editData.about.bio}
+                                        onChange={e => setEditData({ ...editData, about: { ...editData.about, bio: e.target.value } })} />
+                                </div>
                                 <div className="flex-group">
-                                    <div className="w-50 form-group"><label>Age Stat</label><input type="text" value={editData.about.age} onChange={(e) => setEditData({...editData, about: {...editData.about, age: e.target.value}})} /></div>
-                                    <div className="w-50 form-group"><label>Projects Stat</label><input type="text" value={editData.about.projects} onChange={(e) => setEditData({...editData, about: {...editData.about, projects: e.target.value}})} /></div>
+                                    <div className="form-group w-50">
+                                        <label>Age / DOB Stat</label>
+                                        <input type="text" value={editData.about.age}
+                                            onChange={e => setEditData({ ...editData, about: { ...editData.about, age: e.target.value } })} />
+                                    </div>
+                                    <div className="form-group w-50">
+                                        <label>Projects Stat</label>
+                                        <input type="text" value={editData.about.projects}
+                                            onChange={e => setEditData({ ...editData, about: { ...editData.about, projects: e.target.value } })} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* EDUCATION, WORK, ETC. (Keep existing logic but keep content clean) */}
-                    {['education', 'work', 'experience', 'skills', 'projects', 'blog'].includes(activeTab) && (
+                    {/* ── EDUCATION ────────────────────────────────────────── */}
+                    {activeTab === 'education' && (
                         <div className="tab-pane cms-pane">
-                            <div className="pane-header">
-                                <div><h2 className="pane-title" style={{textTransform: 'capitalize'}}>{activeTab}</h2><p className="pane-desc">Manage your {activeTab} history and details.</p></div>
-                                <div style={{ display: 'flex', gap: '12px' }}>
-                                    <button onClick={() => handleAddItem(activeTab, {})} className="btn btn-secondary top-save-btn">Add New</button>
-                                    <button onClick={() => handleSave()} className="btn btn-primary top-save-btn">Save Changes</button>
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {editData.education.map((item: EducationItem, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Education #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('education', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Degree / Certificate</label>
+                                            <input type="text" value={item.degree} onChange={e => updateListItem('education', i, 'degree', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>School / Institution</label>
+                                            <input type="text" value={item.school} onChange={e => updateListItem('education', i, 'school', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Year / Period</label>
+                                            <input type="text" value={item.year} onChange={e => updateListItem('education', i, 'year', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Major / Subject</label>
+                                            <input type="text" value={item.major} onChange={e => updateListItem('education', i, 'major', e.target.value)} />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            {saveStatus && <div className="status-badge active mb-4">✓ {saveStatus}</div>}
-                            <p style={{color: '#94a3b8'}}>Editing items in this category.</p>
-                            {/* ... simplified for brevity, logic remains the same as original ... */}
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '' })}>
+                                <Plus size={16} /> Add Education
+                            </button>
                         </div>
                     )}
 
-                    {/* SETTINGS */}
+                    {/* ── WORK HISTORY ─────────────────────────────────────── */}
+                    {activeTab === 'work' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {editData.work.map((job: WorkItem, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Position #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('work', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Job Title / Role</label>
+                                            <input type="text" value={job.role} onChange={e => updateListItem('work', i, 'role', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Company Name</label>
+                                            <input type="text" value={job.company} onChange={e => updateListItem('work', i, 'company', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Start Date (YYYY-MM-DD)</label>
+                                            <input type="text" value={job.startDate} placeholder="e.g. 2022-01-15"
+                                                onChange={e => updateListItem('work', i, 'startDate', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>End Date (leave blank = Ongoing)</label>
+                                            <input type="text" value={job.endDate ?? ''} placeholder="e.g. 2024-06-30 or blank"
+                                                onChange={e => updateListItem('work', i, 'endDate', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Responsibilities / Details</label>
+                                        {job.details.map((detail, di) => (
+                                            <div key={di} className="detail-row">
+                                                <input type="text" value={detail}
+                                                    onChange={e => updateWorkDetail(i, di, e.target.value)}
+                                                    placeholder={`Detail ${di + 1}`} />
+                                                <button className="icon-btn danger" onClick={() => removeWorkDetail(i, di)}><Minus size={14} /></button>
+                                            </div>
+                                        ))}
+                                        <button className="add-inline-btn" onClick={() => addWorkDetail(i)}><Plus size={14} /> Add Detail</button>
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''] })}>
+                                <Plus size={16} /> Add Position
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── ACHIEVEMENTS (Experience) ─────────────────────────── */}
+                    {activeTab === 'experience' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {editData.experience.map((item: ExperienceItem, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Achievement #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('experience', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Event / Competition Name</label>
+                                            <input type="text" value={item.role} onChange={e => updateListItem('experience', i, 'role', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Organizer / Club</label>
+                                            <input type="text" value={item.company} onChange={e => updateListItem('experience', i, 'company', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Year / Period</label>
+                                            <input type="text" value={item.period} onChange={e => updateListItem('experience', i, 'period', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Description</label>
+                                            <input type="text" value={item.desc} onChange={e => updateListItem('experience', i, 'desc', e.target.value)} />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '' })}>
+                                <Plus size={16} /> Add Achievement
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── TECH STACK (Skills) ───────────────────────────────── */}
+                    {activeTab === 'skills' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {editData.skills.map((cat: SkillCategory, ci: number) => (
+                                <div key={ci} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                                            <label>Category Name</label>
+                                            <input type="text" value={cat.name}
+                                                onChange={e => setEditData(prev => {
+                                                    const skills = prev.skills.map((c, idx) => idx === ci ? { ...c, name: e.target.value } : c);
+                                                    return { ...prev, skills };
+                                                })} />
+                                        </div>
+                                        <button className="remove-btn" style={{ marginTop: '24px' }} onClick={() => removeListItem('skills', ci)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Skills (one per row)</label>
+                                        {cat.items.map((item, ii) => (
+                                            <div key={ii} className="detail-row">
+                                                <input type="text" value={item}
+                                                    onChange={e => updateSkillItem(ci, ii, e.target.value)}
+                                                    placeholder={`Skill ${ii + 1}`} />
+                                                <button className="icon-btn danger" onClick={() => removeSkillItem(ci, ii)}><Minus size={14} /></button>
+                                            </div>
+                                        ))}
+                                        <button className="add-inline-btn" onClick={() => addSkillItem(ci)}><Plus size={14} /> Add Skill</button>
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('skills', { name: 'New Category', items: [''] })}>
+                                <Plus size={16} /> Add Category
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── PROJECTS (Portfolio) ──────────────────────────────── */}
+                    {activeTab === 'projects' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {editData.projects.map((project: ProjectItem, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Showcase #{project.showcase}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('projects', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Project Title</label>
+                                            <input type="text" value={project.title} onChange={e => updateListItem('projects', i, 'title', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Showcase Number</label>
+                                            <input type="number" value={project.showcase} onChange={e => updateListItem('projects', i, 'showcase', parseInt(e.target.value))} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Description</label>
+                                        <textarea rows={3} value={project.desc} onChange={e => updateListItem('projects', i, 'desc', e.target.value)} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Tags (one per row)</label>
+                                        {project.tags.map((tag, ti) => (
+                                            <div key={ti} className="detail-row">
+                                                <input type="text" value={tag} onChange={e => updateProjectTag(i, ti, e.target.value)} placeholder={`Tag ${ti + 1}`} />
+                                                <button className="icon-btn danger" onClick={() => {
+                                                    setEditData(prev => {
+                                                        const projects = prev.projects.map((p, pi) =>
+                                                            pi === i ? { ...p, tags: p.tags.filter((_, idx) => idx !== ti) } : p
+                                                        );
+                                                        return { ...prev, projects };
+                                                    });
+                                                }}><Minus size={14} /></button>
+                                            </div>
+                                        ))}
+                                        <button className="add-inline-btn" onClick={() => {
+                                            setEditData(prev => {
+                                                const projects = prev.projects.map((p, pi) =>
+                                                    pi === i ? { ...p, tags: [...p.tags, ''] } : p
+                                                );
+                                                return { ...prev, projects };
+                                            });
+                                        }}><Plus size={14} /> Add Tag</button>
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('projects', { title: '', desc: '', tags: [''], showcase: editData.projects.length + 1 })}>
+                                <Plus size={16} /> Add Project
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── BLOG / JOURNAL ────────────────────────────────────── */}
+                    {activeTab === 'blog' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {editData.blog.map((post: BlogItem, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Post #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('blog', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Post Title</label>
+                                            <input type="text" value={post.title} onChange={e => updateListItem('blog', i, 'title', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Category</label>
+                                            <input type="text" value={post.category} onChange={e => updateListItem('blog', i, 'category', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Date</label>
+                                        <input type="text" value={post.date} placeholder="e.g. Mar 15, 2024"
+                                            onChange={e => updateListItem('blog', i, 'date', e.target.value)} />
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('blog', { title: '', date: '', category: '' })}>
+                                <Plus size={16} /> Add Post
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── CONTACT DETAILS ─────────────────────────────────── */}
+                    {activeTab === 'contact' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+
+                            <div className="form-section">
+                                <h4 className="section-label">General Contact</h4>
+                                <div className="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" value={editData.contact.email}
+                                        onChange={e => setEditData({ ...editData, contact: { ...editData.contact, email: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="text" value={editData.contact.phone}
+                                        onChange={e => setEditData({ ...editData, contact: { ...editData.contact, phone: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Location / Address</label>
+                                    <input type="text" value={editData.contact.location}
+                                        onChange={e => setEditData({ ...editData, contact: { ...editData.contact, location: e.target.value } })} />
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="section-label">Social & Messaging Links</h4>
+                                <div className="form-group">
+                                    <label>WhatsApp Link (e.g. https://wa.me/...)</label>
+                                    <input type="text" value={editData.contact.whatsapp}
+                                        onChange={e => setEditData({ ...editData, contact: { ...editData.contact, whatsapp: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Messenger Link (e.g. https://m.me/...)</label>
+                                    <input type="text" value={editData.contact.messenger}
+                                        onChange={e => setEditData({ ...editData, contact: { ...editData.contact, messenger: e.target.value } })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Facebook Profile Link</label>
+                                    <input type="text" value={editData.contact.facebook}
+                                        onChange={e => setEditData({ ...editData, contact: { ...editData.contact, facebook: e.target.value } })} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── SETTINGS ─────────────────────────────────────────── */}
                     {activeTab === 'settings' && (
                         <div className="tab-pane">
                             <h2 className="pane-title">Settings</h2>
                             <div className="dashboard-card full-width" style={{ textAlign: 'center', padding: '80px 20px' }}>
-                                <span style={{ fontSize: '4rem', display: 'block', marginBottom: '16px' }}>⚙️</span><h3 style={{ color: '#e2e8f0', marginBottom: '8px' }}>Preferences Locked</h3><p style={{ color: '#94a3b8', maxWidth: '400px', margin: '0 auto' }}>System configuration is currently read-only.</p>
+                                <span style={{ fontSize: '4rem', display: 'block', marginBottom: '16px' }}>⚙️</span>
+                                <h3 style={{ color: '#e2e8f0', marginBottom: '8px' }}>Preferences Locked</h3>
+                                <p style={{ color: '#94a3b8', maxWidth: '400px', margin: '0 auto' }}>System configuration is currently read-only.</p>
                             </div>
                         </div>
                     )}
@@ -308,101 +669,123 @@ const AdminDashboard = () => {
 
             <style>{`
                 .admin-layout { display: flex; min-height: 100vh; background: #030712; }
-                .admin-sidebar { width: 260px; background: #0b1120; border-right: 1px solid #1e293b; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+                .admin-sidebar { width: 260px; background: #0b1120; border-right: 1px solid #1e293b; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
                 .sidebar-header { padding: 32px 24px; border-bottom: 1px solid #1e293b; }
                 .sidebar-header h2 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; margin-bottom: 8px; }
-                .sec-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.65rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 100px; border: 1px solid rgba(16, 185, 129, 0.2); text-transform: uppercase; letter-spacing: 0.05em; }
+                .sec-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.65rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 100px; border: 1px solid rgba(16,185,129,0.2); text-transform: uppercase; letter-spacing: 0.05em; }
                 .sec-badge .dot { width: 5px; height: 5px; background: #10b981; border-radius: 50%; box-shadow: 0 0 6px #10b981; }
-                
+
                 .sidebar-group-title { padding: 24px 20px 8px; font-size: 0.7rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.1em; }
                 .sidebar-nav { padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
                 .primary-nav { flex: 1; }
-                .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; border-radius: 8px; color: #94a3b8; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-align: left; position: relative; }
-                .nav-item:hover { background: rgba(255, 255, 255, 0.03); color: #e2e8f0; }
+                .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; border-radius: 8px; color: #94a3b8; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: left; position: relative; width: 100%; }
+                .nav-item:hover { background: rgba(255,255,255,0.03); color: #e2e8f0; }
                 .nav-item.active { background: #1e293b; color: #f8fafc; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; }
                 .count-badge { position: absolute; right: 12px; background: #3b82f6; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 100px; }
-                
+
                 .sidebar-footer { padding: 20px 12px; border-top: 1px solid #1e293b; display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
-                .footer-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; border-radius: 8px; color: #94a3b8; font-size: 0.875rem; font-weight: 600; cursor: pointer; text-align: left; }
-                .footer-btn:hover { background: rgba(255, 255, 255, 0.03); color: #f8fafc; }
-                .footer-btn.danger:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-                .pwa-badge { margin: 0 12px 8px; padding: 10px 14px; background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.2); border-radius: 8px; color: #3b82f6; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-                .pwa-badge.install-btn { width: calc(100% - 24px); border: 1px solid var(--primary); background: rgba(59, 130, 246, 0.1); cursor: pointer; transition: var(--transition); text-align: left; }
-                .pwa-badge.install-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+                .footer-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; border-radius: 8px; color: #94a3b8; font-size: 0.875rem; font-weight: 600; cursor: pointer; text-align: left; width: 100%; }
+                .footer-btn:hover { background: rgba(255,255,255,0.03); color: #f8fafc; }
+                .footer-btn.danger:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
+                .pwa-badge { margin: 0 0 8px; padding: 10px 14px; background: rgba(59,130,246,0.05); border: 1px dashed rgba(59,130,246,0.2); border-radius: 8px; color: #3b82f6; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
                 .admin-main { flex: 1; padding: 48px; overflow-y: auto; height: 100vh; box-sizing: border-box; background: #030712; }
-                .main-content-wrapper { max-width: 900px; margin: 0 auto; }
-                
-                .pane-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #1e293b; }
+                .main-content-wrapper { max-width: 960px; margin: 0 auto; }
+
+                .pane-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #1e293b; gap: 16px; flex-wrap: wrap; }
                 .pane-title { font-size: 2rem; font-weight: 800; color: #f8fafc; margin-bottom: 8px; }
                 .pane-desc { color: #94a3b8; font-size: 0.9375rem; }
 
+                .status-badge.success { display: inline-block; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #10b981; padding: 10px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; margin-bottom: 24px; }
+
+                /* Form Sections */
+                .form-section { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+                .section-label { font-size: 0.875rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; }
+                .flex-group { display: flex; gap: 20px; flex-wrap: wrap; }
+                .w-50 { flex: 1; min-width: 200px; }
+                .form-group { margin-bottom: 18px; }
+                .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+                .form-group input, .form-group textarea {
+                    width: 100%; padding: 11px 14px; border-radius: 8px;
+                    border: 1px solid #334155; background: #0f172a; color: #f1f5f9;
+                    font-family: inherit; font-size: 0.9375rem;
+                    transition: border-color 0.2s;
+                    box-sizing: border-box;
+                }
+                .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+                .form-group textarea { resize: vertical; }
+
+                /* Item Cards */
+                .item-card { position: relative; }
+                .item-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 12px; }
+                .remove-btn { display: flex; align-items: center; gap: 6px; padding: 7px 12px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; border-radius: 8px; cursor: pointer; font-size: 0.8125rem; font-weight: 600; white-space: nowrap; flex-shrink: 0; transition: 0.2s; }
+                .remove-btn:hover { background: rgba(239,68,68,0.15); }
+                .add-btn { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(59,130,246,0.08); border: 1px dashed rgba(59,130,246,0.3); color: #3b82f6; border-radius: 12px; cursor: pointer; font-size: 0.9375rem; font-weight: 600; width: 100%; justify-content: center; transition: 0.2s; margin-top: 8px; }
+                .add-btn:hover { background: rgba(59,130,246,0.14); border-color: #3b82f6; }
+                .add-inline-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: rgba(59,130,246,0.06); border: 1px dashed rgba(59,130,246,0.25); color: #3b82f6; border-radius: 8px; cursor: pointer; font-size: 0.8125rem; font-weight: 600; transition: 0.2s; margin-top: 8px; }
+                .add-inline-btn:hover { background: rgba(59,130,246,0.12); }
+                .detail-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+                .detail-row input { flex: 1; }
+                .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #334155; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; color: #94a3b8; }
+                .icon-btn.danger { border-color: rgba(239,68,68,0.3); color: #ef4444; }
+                .icon-btn.danger:hover { background: rgba(239,68,68,0.1); }
+
                 /* Dashboard Grid */
-                .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+                .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
                 .dashboard-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 24px; display: flex; align-items: center; gap: 20px; transition: transform 0.2s; }
                 .dashboard-card:hover { transform: translateY(-4px); }
-                .card-icon { font-size: 2rem; width: 56px; height: 56px; border-radius: 14px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; color: #3b82f6; }
+                .card-icon { width: 56px; height: 56px; border-radius: 14px; background: rgba(59,130,246,0.1); display: flex; align-items: center; justify-content: center; color: #3b82f6; flex-shrink: 0; }
                 .card-info h3 { font-size: 0.875rem; color: #94a3b8; margin-bottom: 4px; font-weight: 500; }
                 .card-info .stat { font-size: 2rem; font-weight: 800; color: #f8fafc; margin: 0; }
 
-                /* Messages List */
+                /* Messages */
                 .messages-list { display: flex; flex-direction: column; gap: 16px; }
                 .message-card { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; padding: 24px; }
-                .message-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+                .message-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
                 .user-info { display: flex; gap: 16px; align-items: center; }
-                .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+                .avatar { width: 40px; height: 40px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
                 .user-info h4 { color: #f8fafc; margin-bottom: 4px; }
-                .meta { color: #64748b; font-size: 0.8125rem; display: flex; align-items: center; gap: 8px; }
+                .meta { color: #64748b; font-size: 0.8125rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
                 .message-date { color: #64748b; font-size: 0.8125rem; display: flex; align-items: center; gap: 6px; }
                 .message-body { color: #e2e8f0; font-size: 0.9375rem; line-height: 1.6; margin-bottom: 20px; padding: 16px; background: #0f172a; border-radius: 12px; }
-                .message-actions { display: flex; gap: 12px; }
-
-                /* Shared UI */
-                .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-                .btn-primary { background: #3b82f6; color: white; }
-                .btn-primary:hover { background: #2563eb; }
-                .btn-secondary { background: #1e293b; color: #f8fafc; }
-                .btn-small { padding: 8px 14px; font-size: 0.8125rem; border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: 600; }
-                .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
-                .btn-danger:hover { background: #ef4444; color: white; }
-                
+                .message-actions { display: flex; gap: 12px; flex-wrap: wrap; }
                 .empty-state { text-align: center; padding: 80px 20px; color: #64748b; }
                 .empty-state p { margin-top: 16px; }
 
-                .cms-form.form-section { padding: 32px; background: #0b1120; border-radius: 16px; border: 1px solid #1e293b; margin-bottom: 24px; }
-                .flex-group { display: flex; gap: 20px; }
-                .w-50 { flex: 1; }
-                .form-group { margin-bottom: 20px; }
-                .cms-form label { display: block; font-size: 0.8125rem; font-weight: 600; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
-                .cms-form input, .cms-form textarea { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; font-family: inherit; }
+                /* Buttons */
+                .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.9375rem; }
+                .btn-primary { background: #3b82f6; color: white; }
+                .btn-primary:hover { background: #2563eb; }
+                .btn-secondary { background: #1e293b; color: #f8fafc; }
+                .btn-secondary:hover { background: #293548; }
+                .btn-small { padding: 8px 14px; font-size: 0.8125rem; border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; border: none; }
+                .btn-danger { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+                .btn-danger:hover { background: #ef4444; color: white; }
 
                 .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
+                /* Mobile */
                 .admin-mobile-header { display: none; padding: 16px 24px; background: #0b1120; border-bottom: 1px solid #1e293b; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 900; }
-                .admin-mobile-header h2 { font-size: 1.125rem; }
-                .sidebar-toggle { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: none; color: white; border-radius: 6px; cursor: pointer; }
+                .admin-mobile-header h2 { font-size: 1.125rem; color: #f8fafc; }
+                .sidebar-toggle { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: none; color: white; border-radius: 8px; cursor: pointer; font-size: 1.25rem; }
 
                 @media (max-width: 992px) {
                     .admin-layout { flex-direction: column; }
-                    .admin-sidebar { 
-                        position: fixed; top: 0; left: -260px; z-index: 1000; width: 260px;
-                        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    }
-                    .admin-sidebar.open { transform: translateX(260px); }
-                    .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 950; backdrop-filter: blur(4px); }
+                    .admin-sidebar { position: fixed; top: 0; left: -280px; z-index: 1000; width: 260px; transition: left 0.3s cubic-bezier(0.4,0,0.2,1); }
+                    .admin-sidebar.open { left: 0; }
+                    .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 950; backdrop-filter: blur(4px); }
                     .admin-mobile-header { display: flex; }
                     .desktop-only { display: none; }
-                    .admin-main { padding: 24px 16px; }
+                    .admin-main { padding: 24px 16px; height: auto; overflow-y: visible; }
                     .pane-title { font-size: 1.5rem; }
-                    .message-header { flex-direction: column; gap: 12px; }
-                    .message-date { margin-left: 56px; }
                 }
 
                 @media (max-width: 600px) {
                     .dashboard-grid { grid-template-columns: 1fr; }
-                    .pane-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-                    .btn-small { width: 100%; justify-content: center; }
+                    .pane-header { flex-direction: column; align-items: flex-start; }
+                    .flex-group { flex-direction: column; }
+                    .w-50 { min-width: unset; }
                     .message-actions { flex-direction: column; }
                 }
             `}</style>

@@ -1,128 +1,326 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import avtarImg from '../assets/avtar.png';
+
+const navLinks = [
+    { to: '/about', label: 'About' },
+    { to: '/education', label: 'Education' },
+    { to: '/work', label: 'Experience' },
+    { to: '/achievements', label: 'Achievements' },
+    { to: '/skills', label: 'Skills' },
+    { to: '/projects', label: 'Projects' },
+    { to: '/blog', label: 'Blog' },
+    { to: '/contact', label: 'Contact' },
+];
 
 const Header = () => {
     const [scrolled, setScrolled] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 50);
-        };
+        const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Close menu on route change
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [location.pathname]);
+
+    // Prevent body scroll when menu is open
+    useEffect(() => {
+        document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [isMenuOpen]);
 
     const toggleTheme = () => {
         setIsDarkMode(!isDarkMode);
         document.body.classList.toggle('light-mode');
     };
 
+    const closeMenu = () => setIsMenuOpen(false);
+
     return (
-        <header className={scrolled ? 'scrolled' : ''} style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            zIndex: 1000,
-            padding: scrolled ? '12px 0' : '20px 0',
-            transition: 'var(--transition)',
-            backgroundColor: scrolled ? 'var(--nav-bg)' : 'transparent',
-            backdropFilter: scrolled ? 'blur(12px)' : 'none',
-            borderBottom: scrolled ? '1px solid var(--border-color)' : 'none'
-        }}>
-            <nav className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <img src={avtarImg} alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
-                    <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>Shah Abdul Mazid</span>
-                </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-                    <ul className={`nav-links ${isMenuOpen ? 'mobile-open' : ''}`} style={{ listStyle: 'none' }}>
-                        <li><Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
-                        <li><Link to="/education" onClick={() => setIsMenuOpen(false)}>Education</Link></li>
-                        <li><Link to="/work" onClick={() => setIsMenuOpen(false)}>Experience</Link></li>
-                        <li><Link to="/achievements" onClick={() => setIsMenuOpen(false)}>Achievements</Link></li>
-                        <li><Link to="/skills" onClick={() => setIsMenuOpen(false)}>Skills</Link></li>
-                        <li><Link to="/projects" onClick={() => setIsMenuOpen(false)}>Projects</Link></li>
-                        <li><Link to="/blog" onClick={() => setIsMenuOpen(false)}>Blog</Link></li>
-                        <li><Link to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
-                        <li className="mobile-only"><Link to="/login/admin" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, marginTop: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '20px', width: '100%', display: 'block' }}>⚙ Admin Panel</Link></li>
+        <>
+            <header className={scrolled ? 'scrolled' : ''} style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                zIndex: 1000,
+                padding: scrolled ? '12px 0' : '20px 0',
+                transition: 'var(--transition)',
+                backgroundColor: scrolled ? 'var(--nav-bg)' : 'transparent',
+                backdropFilter: scrolled ? 'blur(12px)' : 'none',
+                borderBottom: scrolled ? '1px solid var(--border-color)' : 'none'
+            }}>
+                <nav className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* Logo */}
+                    <Link to="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+                        <div style={{ position: 'relative' }}>
+                            <div style={{
+                                position: 'absolute', inset: '-2px', borderRadius: '50%',
+                                background: 'var(--gradient)', zIndex: 0
+                            }} />
+                            <img src={avtarImg} alt="Logo" style={{
+                                width: '36px', height: '36px', borderRadius: '50%',
+                                objectFit: 'cover', position: 'relative', zIndex: 1,
+                                border: '2px solid var(--bg-color)'
+                            }} />
+                        </div>
+                        <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-color)', whiteSpace: 'nowrap' }}>Shah Abdul Mazid</span>
+                    </Link>
+
+                    {/* Desktop Nav */}
+                    <ul className="nav-links-desktop">
+                        {navLinks.map((link) => (
+                            <li key={link.to}>
+                                <Link
+                                    to={link.to}
+                                    className={location.pathname === link.to ? 'nav-link active' : 'nav-link'}
+                                >
+                                    {link.label}
+                                </Link>
+                            </li>
+                        ))}
                     </ul>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button 
-                            onClick={toggleTheme}
-                            aria-label="Toggle theme"
-                            id="theme-toggle"
-                        >
+
+                    {/* Right Controls */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {/* Admin link - desktop only */}
+                        <Link to="/login/admin" className="admin-btn-desktop btn btn-secondary">
+                            ⚙ Admin
+                        </Link>
+
+                        {/* Theme Toggle */}
+                        <button onClick={toggleTheme} aria-label="Toggle theme" id="theme-toggle">
                             {isDarkMode ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
                             ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
                             )}
                         </button>
-                        <button 
+
+                        {/* Hamburger - mobile only */}
+                        <button
                             className={`mobile-toggle ${isMenuOpen ? 'active' : ''}`}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             aria-label="Toggle menu"
+                            aria-expanded={isMenuOpen}
+                            id="hamburger-btn"
                         >
-                            <span className="bar"></span>
-                            <span className="bar"></span>
-                            <span className="bar"></span>
+                            <span className="bar" />
+                            <span className="bar" />
+                            <span className="bar" />
                         </button>
-                        <div style={{ display: 'none' }} className="admin-link-desktop">
-                            <Link to="/login/admin" className="btn btn-secondary btn-small" style={{ fontSize: '0.8125rem', padding: '6px 12px' }}>⚙ Admin</Link>
-                        </div>
                     </div>
+                </nav>
+            </header>
+
+            {/* Mobile Menu Backdrop */}
+            <div
+                className={`mobile-backdrop ${isMenuOpen ? 'open' : ''}`}
+                onClick={closeMenu}
+                aria-hidden="true"
+            />
+
+            {/* Mobile Drawer */}
+            <aside className={`mobile-drawer ${isMenuOpen ? 'open' : ''}`} aria-label="Mobile navigation">
+                <div className="mobile-drawer-header">
+                    <Link to="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }} onClick={closeMenu}>
+                        <img src={avtarImg} alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-color)' }}>Shah Abdul Mazid</span>
+                    </Link>
+                    <button className="drawer-close" onClick={closeMenu} aria-label="Close menu">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                    </button>
                 </div>
-            </nav>
+
+                <nav className="mobile-nav">
+                    <ul>
+                        {navLinks.map((link) => (
+                            <li key={link.to}>
+                                <Link
+                                    to={link.to}
+                                    className={location.pathname === link.to ? 'mobile-nav-link active' : 'mobile-nav-link'}
+                                    onClick={closeMenu}
+                                >
+                                    {link.label}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+
+                <div className="mobile-drawer-footer">
+                    <Link to="/login/admin" className="btn btn-secondary" style={{ width: '100%', textAlign: 'center' }} onClick={closeMenu}>
+                        ⚙ Admin Panel
+                    </Link>
+                </div>
+            </aside>
+
             <style>{`
                 #theme-toggle {
                     background: transparent;
                     border: 1px solid var(--border-color);
                     color: var(--text-color);
                     cursor: pointer;
-                    width: 40px;
-                    height: 40px;
+                    width: 40px; height: 40px;
                     border-radius: 12px;
+                    display: flex; align-items: center; justify-content: center;
+                    transition: var(--transition);
+                    flex-shrink: 0;
+                }
+                #theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
+
+                .admin-btn-desktop {
+                    font-size: 0.8125rem;
+                    padding: 6px 14px;
+                    border-radius: 100px;
+                    white-space: nowrap;
+                    text-decoration: none;
+                }
+
+                /* Desktop nav */
+                .nav-links-desktop {
+                    list-style: none;
                     display: flex;
+                    gap: 4px;
                     align-items: center;
+                }
+                .nav-link {
+                    text-decoration: none;
+                    color: var(--text-color);
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    opacity: 0.65;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    transition: var(--transition);
+                    white-space: nowrap;
+                }
+                .nav-link:hover { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.06); }
+                .nav-link.active { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.1); font-weight: 700; }
+
+                /* Hamburger */
+                .mobile-toggle {
+                    display: none;
+                    width: 40px; height: 40px;
+                    background: transparent;
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    cursor: pointer;
+                    flex-direction: column;
                     justify-content: center;
+                    align-items: center;
+                    gap: 5px;
+                    flex-shrink: 0;
                     transition: var(--transition);
                 }
-                #theme-toggle:hover { border-color: var(--primary); }
-                .nav-links { display: flex; gap: 32px; align-items: center; }
-                .nav-links a { text-decoration: none; color: var(--text-color); font-size: 0.9375rem; font-weight: 500; opacity: 0.7; transition: var(--transition); }
-                .nav-links a:hover { opacity: 1; color: var(--primary); }
-                .mobile-only { display: none; }
-                
-                .mobile-toggle { 
-                    display: none; width: 40px; height: 40px; background: transparent; border: 1px solid var(--border-color); 
-                    border-radius: 12px; cursor: pointer; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
+                .mobile-toggle:hover { border-color: var(--primary); }
+                .mobile-toggle .bar {
+                    width: 20px; height: 2px;
+                    background: var(--text-color);
+                    border-radius: 2px;
+                    transition: var(--transition);
+                    transform-origin: center;
                 }
-                .mobile-toggle .bar { width: 20px; height: 2px; background: var(--text-color); transition: var(--transition); border-radius: 2px; }
+                .mobile-toggle.active .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+                .mobile-toggle.active .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+                .mobile-toggle.active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-                @media (min-width: 993px) {
-                    .admin-link-desktop { display: block !important; }
+                /* Backdrop */
+                .mobile-backdrop {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(0, 0, 0, 0.6);
+                    z-index: 1100;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    backdrop-filter: blur(2px);
+                }
+                .mobile-backdrop.open { opacity: 1; }
+
+                /* Drawer */
+                .mobile-drawer {
+                    position: fixed;
+                    top: 0; right: -100%;
+                    width: min(320px, 88vw);
+                    height: 100dvh;
+                    background: var(--bg-color);
+                    border-left: 1px solid var(--border-color);
+                    z-index: 1200;
+                    display: flex;
+                    flex-direction: column;
+                    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: -20px 0 60px rgba(0,0,0,0.25);
+                    overflow-y: auto;
+                }
+                .mobile-drawer.open { right: 0; }
+
+                .mobile-drawer-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 20px 24px;
+                    border-bottom: 1px solid var(--border-color);
+                    flex-shrink: 0;
+                }
+                .drawer-close {
+                    background: transparent;
+                    border: 1px solid var(--border-color);
+                    width: 36px; height: 36px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    display: flex; align-items: center; justify-content: center;
+                    color: var(--text-color);
+                    transition: var(--transition);
+                }
+                .drawer-close:hover { border-color: var(--primary); color: var(--primary); }
+
+                .mobile-nav { flex: 1; padding: 16px 16px; }
+                .mobile-nav ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+                .mobile-nav-link {
+                    display: block;
+                    padding: 14px 16px;
+                    text-decoration: none;
+                    color: var(--text-color);
+                    font-size: 1rem;
+                    font-weight: 500;
+                    border-radius: 12px;
+                    opacity: 0.7;
+                    transition: var(--transition);
+                }
+                .mobile-nav-link:hover { opacity: 1; background: rgba(139,92,246,0.08); color: var(--primary); }
+                .mobile-nav-link.active { opacity: 1; background: rgba(139,92,246,0.12); color: var(--primary); font-weight: 700; }
+
+                .mobile-drawer-footer {
+                    padding: 20px 24px;
+                    border-top: 1px solid var(--border-color);
+                    flex-shrink: 0;
+                }
+
+                @media (max-width: 1100px) {
+                    .nav-links-desktop { gap: 0; }
+                    .nav-link { font-size: 0.85rem; padding: 6px 9px; }
                 }
 
                 @media (max-width: 992px) {
-                    .nav-links { 
-                        position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: var(--bg-color); 
-                        flex-direction: column; padding: 100px 40px; border-left: 1px solid var(--border-color);
-                        transition: var(--transition); z-index: 1000; box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-                    }
-                    .nav-links.mobile-open { right: 0; }
+                    .nav-links-desktop { display: none; }
+                    .admin-btn-desktop { display: none; }
                     .mobile-toggle { display: flex; }
-                    .mobile-toggle.active .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-                    .mobile-toggle.active .bar:nth-child(2) { opacity: 0; }
-                    .mobile-toggle.active .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-                    .nav-links .mobile-only { display: block; }
+                    .mobile-backdrop { display: block; }
+                }
+
+                @media (max-width: 480px) {
+                    .logo-link span { display: none; }
                 }
             `}</style>
-        </header>
+        </>
     );
 };
 

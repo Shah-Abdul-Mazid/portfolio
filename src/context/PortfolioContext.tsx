@@ -57,6 +57,14 @@ export interface PortfolioData {
     work: WorkItem[];
     projects: ProjectItem[];
     blog: BlogItem[];
+    contact: {
+        email: string;
+        phone: string;
+        location: string;
+        whatsapp: string;
+        messenger: string;
+        facebook: string;
+    };
 }
 
 const defaultData: PortfolioData = {
@@ -101,7 +109,15 @@ const defaultData: PortfolioData = {
     blog: [
         { title: 'The Future of Web Development', date: 'Mar 15, 2024', category: 'Tech' },
         { title: 'Mastering React Performance', date: 'Feb 28, 2024', category: 'Coding' }
-    ]
+    ],
+    contact: {
+        email: "shahabdulmazid.ezan@yahoo.com",
+        phone: "+880 1531-329222",
+        location: "Mohammadpur, Dhaka-1207",
+        whatsapp: "https://wa.me/8801531329222",
+        messenger: "https://m.me/shahabdulmazid.ezan",
+        facebook: "https://facebook.com/shahabdulmazid.ezan"
+    }
 };
 
 interface PortfolioContextType {
@@ -118,10 +134,19 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
         const savedData = localStorage.getItem('portfolio_data');
         if (savedData) {
             try {
-                // Merge in case we added new fields to the defaultData structure that weren't in localStorage
-                setData({ ...defaultData, ...JSON.parse(savedData) });
+                const parsed = JSON.parse(savedData);
+                // Deep merge contact specifically to ensure new fields aren't lost if old data exists
+                setData({ 
+                    ...defaultData, 
+                    ...parsed,
+                    contact: {
+                        ...defaultData.contact,
+                        ...(parsed.contact || {})
+                    }
+                });
             } catch (error) {
                 console.error("Failed to parse portfolio data from localStorage");
+                setData(defaultData);
             }
         }
     }, []);
