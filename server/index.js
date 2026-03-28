@@ -1,4 +1,5 @@
 import express from 'express';
+import nodemailer from 'nodemailer';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -47,6 +48,45 @@ const AnalyticsSchema = new mongoose.Schema({
 
 const Analytics = mongoose.model('Analytics', AnalyticsSchema);
 
+// Nodemailer Transporter Helper
+async function sendAutoReply(email, name) {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+        console.log('Skipping auto-reply: Gmail credentials not configured in .env.');
+        return;
+    }
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_PASS
+        }
+    });
+
+    const mailOptions = {
+        from: `"Shah Abdul Mazid" <${process.env.GMAIL_USER}>`,
+        to: email,
+        subject: 'Thank you for your message!',
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-top: 5px solid #007bff;">
+                <h2 style="color: #333;">Hello ${name},</h2>
+                <p>I hope this email finds you well!</p>
+                <p>This is an automated confirmation to let you know that I've successfully received your message through my portfolio's contact form.</p>
+                <p>I truly appreciate you reaching out and will get back to you as soon as possible.</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="font-size: 14px; color: #777;">Best regards,<br><strong>Shah Abdul Mazid</strong></p>
+            </div>
+        `
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Auto-reply sent successfully to ${email}`);
+    } catch (error) {
+        console.error('❌ Error sending auto-reply:', error);
+    }
+}
+
 // API Endpoints
 // Post message
 app.post('/api/messages', async (req, res) => {
@@ -55,6 +95,10 @@ app.post('/api/messages', async (req, res) => {
         const newMessage = new Message(req.body);
         const savedMessage = await newMessage.save();
         console.log('✅ Message saved to MongoDB:', savedMessage._id);
+        
+        // Trigger auto-reply
+        sendAutoReply(req.body.email, req.body.name).catch(console.error);
+        
         res.status(201).json(savedMessage);
     } catch (err) {
         console.error('Error saving message:', err.message);

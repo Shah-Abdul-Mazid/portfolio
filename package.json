@@ -19,6 +19,7 @@
     "lucide-react": "^0.475.0",
     "mongodb": "^7.1.1",
     "mongoose": "^8.10.1",
+    "nodemailer": "^8.0.4",
     "pg": "^8.13.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
