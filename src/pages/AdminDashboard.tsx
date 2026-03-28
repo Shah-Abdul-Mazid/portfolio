@@ -32,9 +32,9 @@ const AdminDashboard = () => {
     const fetchRealTimeData = async () => {
         setLoading(true);
         try {
-            const viewsRes = await fetch('http://localhost:3001/api/analytics');
+            const viewsRes = await fetch('/api/analytics');
             const viewsData = await viewsRes.json();
-            const msgsRes = await fetch('http://localhost:3001/api/messages');
+            const msgsRes = await fetch('/api/messages');
             const msgsData = await msgsRes.json();
             setStats({ views: viewsData?.count || 0, messages: msgsData?.length || 0 });
             setMessages(msgsData || []);
@@ -48,7 +48,7 @@ const AdminDashboard = () => {
     const handleDeleteMessage = async (id: string) => {
         if (!window.confirm('Delete this message?')) return;
         try {
-            await fetch(`http://localhost:3001/api/messages/${id}`, { method: 'DELETE' });
+            await fetch(`/api/messages/${id}`, { method: 'DELETE' });
             fetchRealTimeData();
         } catch { alert('Failed to delete message'); }
     };

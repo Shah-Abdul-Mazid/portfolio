@@ -8,7 +8,7 @@ export const useVisitorTracker = () => {
 
             if (!hasVisited) {
                 try {
-                    const response = await fetch('http://localhost:3001/api/analytics/track', {
+                    const response = await fetch('/api/analytics/track', {
                         method: 'POST'
                     });
 
