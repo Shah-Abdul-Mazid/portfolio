@@ -68,34 +68,6 @@ async function sendAutoReply(email, name, req_phone, req_query) {
     } catch (error) {
         console.error('❌ Error sending auto-reply:', error);
     }
-
-    // Admin Notification
-    const adminMailOptions = {
-        from: `"Portfolio Notification" <${process.env.GMAIL_USER}>`,
-        to: 'shahabdulmazid.ezan@yahoo.com',
-        subject: `New Inquiry from ${name}`,
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-top: 5px solid #ffc107;">
-                <h2 style="color: #333;">New Message Received</h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Phone:</strong> ${req_phone || 'N/A'}</p>
-                <p><strong>Message:</strong></p>
-                <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #ffc107; margin-top: 10px;">
-                    ${req_query}
-                </div>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="font-size: 12px; color: #999;">This inquiry was sent from your portfolio contact form.</p>
-            </div>
-        `
-    };
-
-    try {
-        await transporter.sendMail(adminMailOptions);
-        console.log(`🚀 Admin Notification sent to Yahoo!`);
-    } catch (error) {
-        console.error('❌ Error sending admin notification:', error);
-    }
 }
 
 export default async function handler(req, res) {
