@@ -64,7 +64,7 @@ async function sendAutoReply(email, name, req_phone, req_query) {
     });
 
     const mailOptions = {
-        from: `"Shah Abdul Mazid" <${process.env.GMAIL_USER}>`,
+        from: `"Portfolio Support" <${process.env.GMAIL_USER}>`,
         to: email,
         subject: 'Thank you for your message!',
         html: `
@@ -78,6 +78,8 @@ async function sendAutoReply(email, name, req_phone, req_query) {
             </div>
         `
     };
+
+    console.log(`✉️ Preparing auto-reply for: ${name} (${email})`);
 
     try {
         await transporter.sendMail(mailOptions);
