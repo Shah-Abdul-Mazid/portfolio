@@ -135,7 +135,7 @@ const LivingAISystem: React.FC = () => {
             signals.push({ mesh, start: 0, end: 0, progress: 1 }); // Start in inactive state
         }
 
-        const updateSignals = (time: number) => {
+        const updateSignals = () => {
             const posAttr = particleGeometry.attributes.position.array as Float32Array;
             signals.forEach(s => {
                 if (s.progress >= 1) {
@@ -227,7 +227,7 @@ const LivingAISystem: React.FC = () => {
             // Throttle line updates
             if (Math.floor(time * 5) % 2 === 0) {
                 updateConnections();
-                updateSignals(time);
+                updateSignals();
             }
 
             renderer.render(scene, camera);
