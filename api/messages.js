@@ -94,23 +94,14 @@ async function sendAutoReply(email, name, req_phone, req_query) {
       to: email,
       subject: "Thank you for your message!",
       html: `
-        <div style="font-family: Arial; max-width:600px; margin:auto; padding:20px;">
-          <h2>Hello ${name},</h2>
-          <p>Thanks for contacting me. I received your message:</p>
-
-          <div style="background:#f5f5f5; padding:10px; border-left:4px solid #007bff;">
-            ${req_query || "No message provided"}
-          </div>
-
-          <p style="margin-top:20px;">
-            I will get back to you as soon as possible.
-          </p>
-
-          <hr/>
-          <p style="font-size:14px; color:#777;">
-            Best regards,<br/>
-            <strong>Shah Abdul Mazid</strong>
-          </p>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 20px auto; padding: 40px; border: 1px solid #eee; border-top: 4px solid #007bff; color: #333; line-height: 1.6; background-color: #fff;">
+          <h2 style="font-weight: 700; font-size: 24px; margin-top: 0; color: #333;">Hello ${name},</h2>
+          <p style="margin-bottom: 24px; font-size: 16px;">I hope this email finds you well!</p>
+          <p style="margin-bottom: 24px; font-size: 16px;">This is an automated confirmation to let you know that I've successfully received your message through my portfolio's contact form.</p>
+          <p style="margin-bottom: 24px; font-size: 16px;">I truly appreciate you reaching out and will get back to you as soon as possible.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 32px 0;">
+          <p style="margin: 0; color: #666; font-size: 16px;">Best regards,</p>
+          <p style="margin: 4px 0 0 0; font-weight: 700; color: #333; font-size: 18px;">Shah Abdul Mazid</p>
         </div>
       `,
     };
