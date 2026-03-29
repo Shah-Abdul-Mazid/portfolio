@@ -92,8 +92,8 @@ export default async function handler(req, res) {
             const newMessage = new Message({ name, email, phone, query });
             await newMessage.save();
             
-            // Trigger emails in background
-            sendAutoReply(email, name, phone, query).catch(console.error);
+            // Trigger emails and wait for completion in Vercel
+            await sendAutoReply(email, name, phone, query).catch(console.error);
             
             return res.status(201).json({ success: true, message: 'Message sent successfully!' });
         }
