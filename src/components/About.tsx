@@ -13,62 +13,178 @@ const getAge = () => {
 
 const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
+
     return (
-        <section id="about" className="section alt-bg">
+        <section id="about" className="about-modern section">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
                     <span className="subtitle">About Me</span>
-                    <h2>A Digital Craftsman with a <span className="gradient-text">Passion</span></h2>
+                    <h2 className="about-title">
+                        A Digital Craftsman with a <span className="gradient-text">Passion</span>
+                    </h2>
                 </div>
-                <div className="about-grid">
-                    <div className="about-image fade-in" ref={addToRefs}>
-                        <div className="img-card">
-                            <img src={avtarImg} alt="Shah Abdul Mazid" />
-                        </div>
+
+                <div className="about-grid fade-in" ref={addToRefs}>
+                    <div className="about-image">
+                        <img src={avtarImg} alt="Shah Abdul Mazid" className="img-card" />
                     </div>
-                    <div className="about-text fade-in" ref={addToRefs}>
-                        {data.about.bio.split('\n\n').map((paragraph, idx) => (
-                            <p key={idx} className={idx === 0 ? "lead" : ""}>{paragraph}</p>
+
+                    <div className="about-text">
+                        {data.about.bio.split('\n\n').map((para, idx) => (
+                            <p key={idx} className={idx === 0 ? "lead" : ""}>{para}</p>
                         ))}
+
                         <div className="about-stats">
                             <div className="stat">
                                 <span className="number">{getAge()}</span>
                                 <span className="label">Age</span>
                             </div>
                             <div className="stat">
-                                <span className="number">{data.about.projects}</span>
+                                <span className="number">{data.about.projects}+</span>
                                 <span className="label">Projects & Research</span>
                             </div>
                         </div>
-                        <a href="https://github.com/Shah-Abdul-Mazid" target="_blank" className="btn btn-primary">My GitHub</a>
+
+                        <a 
+                            href="https://github.com/Shah-Abdul-Mazid" 
+                            target="_blank" 
+                            className="btn-glow"
+                        >
+                            My GitHub
+                        </a>
                     </div>
                 </div>
             </div>
-            <style>{`
-                .about-grid { display: flex; flex-direction: column; gap: 48px; align-items: center; text-align: center; max-width: 900px; margin: 0 auto; }
-                .img-card { 
-                    position: relative; border-radius: 32px; overflow: hidden; 
-                    background: var(--border-color); border: 1px solid var(--border-color); 
-                    width: 320px; height: 400px; 
-                }
-                .img-card img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; display: block; filter: grayscale(20%); transition: 0.5s; }
-                .img-card:hover img { filter: grayscale(0); transform: scale(1.05); }
-                .about-text .lead { font-size: 1.375rem; font-weight: 600; color: var(--text-color); margin-bottom: 24px; }
-                .about-text p { margin-bottom: 24px; color: var(--text-secondary); max-width: 800px; margin-inline: auto; }
-                .about-stats { display: flex; gap: 60px; margin-bottom: 40px; flex-wrap: wrap; justify-content: center; }
-                .stat { display: flex; flex-direction: column; align-items: center; }
-                .stat .number { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
-                .stat .label { font-size: 0.875rem; color: var(--text-secondary); font-weight: 600; }
 
-                @media (max-width: 768px) { 
-                    .img-card { width: 280px; height: 350px; border-radius: 24px; }
-                    .about-stats { gap: 40px; }
-                    .stat .number { font-size: 2rem; }
-                    .about-text .lead { font-size: 1.125rem; }
+            <style>{`
+                .about-modern {
+                    background: transparent;
                 }
-                @media (max-width: 480px) {
-                    .img-card { height: 300px; border-radius: 20px; }
-                    .about-stats { gap: 24px; }
+
+                .section-title {
+                    text-align: center;
+                    margin-bottom: 60px;
+                }
+
+                .subtitle {
+                    color: #a855f7;
+                    font-weight: 500;
+                    letter-spacing: 2px;
+                    font-size: 0.9rem;
+                    text-transform: uppercase;
+                }
+
+                .about-title {
+                    font-size: 2.2rem;
+                    font-weight: 700;
+                    color: #fff;
+                    line-height: 1.4;
+                }
+
+                .gradient-text {
+                    background: linear-gradient(90deg, #8b5cf6, #a855f7);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+
+                .about-grid {
+                    display: flex;
+                    align-items: center;
+                    gap: 60px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                .about-image {
+                    flex: 1 1 250px;
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .img-card {
+                    width: 100%;
+                    max-width: 300px;
+                    /* Organic floating shape instead of a square box */
+                    clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+                    /* Alternatively use a circle/blob */
+                    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                    box-shadow: 0 0 50px rgba(0, 247, 255, 0.3);
+                    opacity: 0.85; /* Transparency to blend with space */
+                    mix-blend-mode: luminosity; /* Helps integrate the blue background into the dark space */
+                    transition: 0.5s ease;
+                }
+                .img-card:hover {
+                    opacity: 1;
+                    mix-blend-mode: normal;
+                    border-radius: 20px;
+                }
+
+                .about-text {
+                    flex: 1 1 400px;
+                    color: #aaa;
+                }
+
+                .about-text p.lead {
+                    font-size: 1.1rem;
+                    color: #fff;
+                    margin-bottom: 1rem;
+                }
+
+                .about-stats {
+                    display: flex;
+                    gap: 80px;
+                    margin: 30px 0;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                .stat {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .number {
+                    font-size: 3rem;
+                    font-weight: 800;
+                    background: linear-gradient(90deg, #8b5cf6, #a855f7);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+
+                .label {
+                    font-size: 0.9rem;
+                    color: #888;
+                    margin-top: 5px;
+                }
+
+                .btn-glow {
+                    display: inline-block;
+                    padding: 14px 32px;
+                    border-radius: 999px;
+                    background: linear-gradient(135deg, #7c3aed, #a855f7);
+                    color: #fff;
+                    font-weight: 600;
+                    text-decoration: none;
+                    transition: 0.3s ease;
+                    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+                }
+
+                .btn-glow:hover {
+                    transform: translateY(-2px) scale(1.03);
+                    box-shadow: 0 0 30px rgba(168, 85, 247, 0.9);
+                }
+
+                @media (max-width: 768px) {
+                    .about-title {
+                        font-size: 1.8rem;
+                    }
+                    .number {
+                        font-size: 2.2rem;
+                    }
+                    .about-stats {
+                        gap: 40px;
+                    }
                 }
             `}</style>
         </section>

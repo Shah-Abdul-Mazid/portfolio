@@ -10,34 +10,72 @@ import WorkExperience from '../components/WorkExperience';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import FloatingContactForm from '../components/FloatingContactForm';
+import IntelligenceMatrix from '../components/IntelligenceMatrix';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
-import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+
+// Maps section IDs → URL paths
+const SECTION_ROUTES: Record<string, string> = {
+    'hero':         '/',
+    'about':        '/about',
+    'education':    '/education',
+    'work':         '/work',
+    'achievements': '/achievements',
+    'skills':       '/skills',
+    'projects':     '/projects',
+    'blog':         '/blog',
+    'contact':      '/contact',
+};
 
 const Portfolio = () => {
     const { addToRefs } = useIntersectionObserver();
     const location = useLocation();
-    
+    const navigate = useNavigate();
+    const scrollLock = useRef(false);
+
+    // ── Route change → scroll to matching section ─────────────────────────
     useEffect(() => {
-        const path = location.pathname.replace('/', '');
-        if (path) {
-            const element = document.getElementById(path);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        const raw = location.pathname.replace('/', '');
+        const targetId = raw === '' ? 'hero' : raw;
+        const el = document.getElementById(targetId);
+        if (el) {
+            scrollLock.current = true;
+            el.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => { scrollLock.current = false; }, 1000);
         }
-    }, [location]);
+    }, [location.pathname]);
+
+    // ── Scroll → update URL via IntersectionObserver ──────────────────────
+    useEffect(() => {
+        const observers: IntersectionObserver[] = [];
+
+        Object.keys(SECTION_ROUTES).forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const obs = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting && !scrollLock.current) {
+                        const newPath = SECTION_ROUTES[id];
+                        if (window.location.pathname !== newPath) {
+                            navigate(newPath, { replace: true });
+                        }
+                    }
+                },
+                { threshold: 0.45 }
+            );
+
+            obs.observe(el);
+            observers.push(obs);
+        });
+
+        return () => observers.forEach(o => o.disconnect());
+    }, []);
 
     return (
         <div className="app">
-            <div className="glow-bg">
-                <div className="blob blob-1"></div>
-                <div className="blob blob-2"></div>
-                <div className="blob blob-3"></div>
-                <div className="blob blob-4"></div>
-            </div>
+            <IntelligenceMatrix />
             <Header />
             <main>
                 <Hero addToRefs={addToRefs} />

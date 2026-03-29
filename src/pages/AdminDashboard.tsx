@@ -11,10 +11,13 @@ const AdminDashboard = () => {
     const [saveStatus, setSaveStatus] = useState('');
     const [activeTab, setActiveTab] = useState('overview');
     
-    const [stats, setStats] = useState({ views: 0, messages: 0 });
+    const [stats, setStats] = useState({ views: 0, messages: 0, admins: 0 });
     const [messages, setMessages] = useState<any[]>([]);
+    const [adminsList, setAdminsList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [newAdminEmail, setNewAdminEmail] = useState('');
+    const [newAdminPassword, setNewAdminPassword] = useState('');
 
     useEffect(() => {
         if (localStorage.getItem('admin_auth') !== 'true') {
@@ -32,14 +35,31 @@ const AdminDashboard = () => {
     const fetchRealTimeData = async () => {
         setLoading(true);
         try {
+            const token = localStorage.getItem('admin_token');
+            const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+
             const viewsRes = await fetch('/api/analytics');
             const viewsData = await viewsRes.json();
+            
             const msgsRes = await fetch('/api/messages');
             const msgsData = await msgsRes.json();
-            setStats({ views: viewsData?.count || 0, messages: msgsData?.length || 0 });
+
+            let adminsData = [];
+            if (token) {
+                const adminsRes = await fetch('/api/admin/list', { headers });
+                const json = await adminsRes.json();
+                if (json.success) adminsData = json.data;
+            }
+
+            setStats({ 
+                views: viewsData?.count || 0, 
+                messages: msgsData?.length || 0,
+                admins: adminsData.length
+            });
             setMessages(msgsData || []);
-        } catch {
-            // Server not running – silently fail
+            setAdminsList(adminsData);
+        } catch (e){
+            console.error(e)
         } finally {
             setLoading(false);
         }
@@ -55,7 +75,36 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('admin_auth');
+        localStorage.removeItem('admin_token');
         navigate('/login/admin');
+    };
+
+    const handleCreateAdmin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const token = localStorage.getItem('admin_token');
+        if (!token) return alert('Session expired.');
+
+        try {
+            const res = await fetch('/api/admin/register', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Admin user created successfully!');
+                setNewAdminEmail('');
+                setNewAdminPassword('');
+                fetchRealTimeData();
+            } else {
+                alert(data.message || 'Error creating admin');
+            }
+        } catch (e) {
+            alert('Server error creating admin');
+        }
     };
 
     const handleSave = () => {
@@ -207,6 +256,7 @@ const AdminDashboard = () => {
                     {[
                         { id: 'overview', icon: '📊', label: 'Overview' },
                         { id: 'messages', icon: '✉️', label: 'Messages', badge: stats.messages },
+                        { id: 'admins', icon: '👥', label: 'Admin Users', badge: stats.admins },
                         { id: 'settings', icon: '⚙️', label: 'Settings' },
                     ].map(tab => (
                         <button key={tab.id}
@@ -648,6 +698,55 @@ const AdminDashboard = () => {
                                     <input type="text" value={editData.contact.facebook}
                                         onChange={e => setEditData({ ...editData, contact: { ...editData.contact, facebook: e.target.value } })} />
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── MANAGE ADMINS ──────────────────────────────────────── */}
+                    {activeTab === 'admins' && (
+                        <div className="tab-pane">
+                            <div className="pane-header">
+                                <div>
+                                    <h2 className="pane-title">Admin Management</h2>
+                                    <p className="pane-desc">Create and manage superuser accounts.</p>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="section-label">Register New Admin</h4>
+                                <form onSubmit={handleCreateAdmin}>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Email Address</label>
+                                            <input type="email" required value={newAdminEmail}
+                                                onChange={e => setNewAdminEmail(e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Password</label>
+                                            <input type="password" required value={newAdminPassword}
+                                                onChange={e => setNewAdminPassword(e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary" style={{ marginTop: '16px' }}>Create Admin</button>
+                                </form>
+                            </div>
+
+                            <div className="messages-list">
+                                <h4 className="section-label" style={{ marginTop: '20px' }}>Active Admins</h4>
+                                {adminsList.map((admin: any) => (
+                                    <div key={admin._id} className="message-card" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div className="user-info">
+                                            <div className="avatar" style={{ background: '#10b981' }}>{admin.email.charAt(0).toUpperCase()}</div>
+                                            <div>
+                                                <h4 style={{ margin: 0, color: '#f8fafc' }}>{admin.email}</h4>
+                                                <p className="meta" style={{ margin: 0 }}>Role: {admin.role}</p>
+                                            </div>
+                                        </div>
+                                        <div className="message-date">
+                                            Joined: {new Date(admin.created_at).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}

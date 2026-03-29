@@ -32,10 +32,23 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 .badge { display: inline-block; padding: 10px 24px; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 100px; color: var(--primary); font-size: 0.8125rem; font-weight: 600; margin-bottom: 24px; }
                 .hero-btns { display: flex; gap: 16px; margin-top: 40px; justify-content: center; }
                 .image-wrapper { position: relative; width: 140px; height: 140px; margin: 0 auto; }
-                .image-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid #d946ef; padding: 2px; }
-                .btn-gradient { background: linear-gradient(90deg, #818cf8, #f472b6); color: white; border: none; padding: 14px 32px; font-size: 1rem; }
+                .image-wrapper img { 
+                    width: 100%; height: 100%; object-fit: cover; 
+                    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                    border: 2px solid rgba(0, 247, 255, 0.4); 
+                    padding: 2px;
+                    opacity: 0.9;
+                    mix-blend-mode: luminosity;
+                    transition: 0.5s ease;
+                }
+                .image-wrapper img:hover {
+                    opacity: 1;
+                    mix-blend-mode: normal;
+                    border-radius: 50%;
+                }
+                .btn-gradient { background: linear-gradient(90deg, #00f7ff, #a855f7); color: white; border: none; padding: 14px 32px; font-size: 1rem; }
                 .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 14px 32px; font-size: 1rem; }
-                .btn-outline:hover { background: rgba(0,0,0,0.03); }
+                .btn-outline:hover { background: rgba(0, 247, 255, 0.1); border-color: rgba(0, 247, 255, 0.5); }
 
                 @media (max-width: 480px) {
                     .hero-btns { flex-direction: column; width: 100%; }

@@ -5,9 +5,9 @@ const Skills = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
     const categories = data.skills;
 
     return (
-        <section id="skills" className="section alt-bg" style={{ overflow: 'hidden' }}>
-            <div className="container" style={{ maxWidth: '100%', padding: '0' }}>
-                <div className="section-title fade-in" ref={addToRefs} style={{ paddingLeft: '24px', textAlign: 'center' }}>
+        <section id="skills" className="section alt-bg">
+            <div className="container">
+                <div className="section-title fade-in" ref={addToRefs}>
                     <span className="subtitle">Technical Stack</span>
                     <h2>Core <span className="gradient-text">Expertise</span></h2>
                 </div>
@@ -29,8 +29,8 @@ const Skills = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
             </div>
             <style>{`
                 .skills-marquee-container { 
-                    margin-top: 60px; 
-                    padding: 40px 0;
+                    margin-top: 20px; 
+                    padding: 20px 0;
                     position: relative;
                 }
                 .skills-marquee { 

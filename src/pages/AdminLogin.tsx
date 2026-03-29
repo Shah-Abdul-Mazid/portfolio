@@ -13,15 +13,32 @@ const AdminLogin = () => {
         }
     }, [navigate]);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
-        if (username === 'admin' && password === 'admin') {
-            localStorage.setItem('admin_auth', 'true');
-            navigate('/admin/dashboard');
-        } else {
-            setError('Invalid Admin Credentials');
+        try {
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: username, password })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                localStorage.setItem('admin_auth', 'true');
+                localStorage.setItem('admin_token', data.token);
+                navigate('/admin/dashboard');
+            } else {
+                setError(data.message || 'Invalid Admin Credentials');
+            }
+        } catch (err) {
+            setError('Server connection error. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -57,12 +74,12 @@ const AdminLogin = () => {
                     <form onSubmit={handleLogin} className="login-form">
                         {error && <div className="error-message">{error}</div>}
                         <div className="form-group">
-                            <label>Username</label>
+                            <label>Email Address</label>
                             <input 
-                                type="text" 
+                                type="email" 
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Enter admin username"
+                                placeholder="admin@portfolio.com"
                                 required
                                 autoFocus
                             />
@@ -79,7 +96,9 @@ const AdminLogin = () => {
                         </div>
                         <div className="form-submit">
                             <button type="button" onClick={() => navigate('/')} className="btn-back">Return to Site</button>
-                            <button type="submit" className="btn-auth">Authenticate</button>
+                            <button type="submit" className="btn-auth" disabled={loading}>
+                                {loading ? 'Authenticating...' : 'Authenticate'}
+                            </button>
                         </div>
                     </form>
                 </div>

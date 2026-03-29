@@ -121,11 +121,13 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                 }
 
                 .project-card { 
-                    background: #fff; 
+                    background: rgba(15, 23, 42, 0.4); 
                     border: 1px solid rgba(139, 92, 246, 0.2); 
                     border-radius: 46px; 
                     padding: 60px; 
-                    box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
                     text-align: left;
                     height: 100%;
                     box-sizing: border-box;
@@ -136,8 +138,8 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     box-shadow: 0 20px 60px rgba(139, 92, 246, 0.12);
                 }
                 
-                .dark-mode .project-card { background: #1a1a1a; border-color: rgba(255,255,255,0.05); box-shadow: 0 30px 60px rgba(0,0,0,0.2); }
-                .dark-mode .project-slide.active .project-card { border-color: #8b5cf6; box-shadow: 0 20px 60px rgba(139, 92, 246, 0.15); }
+                .dark-mode .project-card { background: rgba(15, 23, 42, 0.5); border-color: rgba(255,255,255,0.05); }
+                .dark-mode .project-slide.active .project-card { border-color: #8b5cf6; }
                 .dark-mode .badge-line { background: rgba(139, 92, 246, 0.3) !important; }
 
                 .showcase-badge { 

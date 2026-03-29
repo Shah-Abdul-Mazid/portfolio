@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import path from 'path';
 
 dotenv.config();
@@ -47,6 +49,29 @@ const AnalyticsSchema = new mongoose.Schema({
 });
 
 const Analytics = mongoose.model('Analytics', AnalyticsSchema);
+
+const AdminSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, default: 'superadmin' },
+    created_at: { type: Date, default: Date.now }
+});
+
+const Admin = mongoose.model('Admin', AdminSchema, process.env.atlas_ADMIN_COLLECTION || 'admin_db');
+
+// Middleware to verify JWT token
+const authMiddleware = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        req.admin = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid token' });
+    }
+};
 
 // Nodemailer Transporter Helper
 async function sendAutoReply(email, name, req_phone, req_query) {
@@ -160,6 +185,67 @@ app.delete('/api/messages/:id', async (req, res) => {
     } catch (err) {
         console.error('Error deleting message:', err.message);
         res.status(500).json({ error: 'Failed to delete message' });
+    }
+});
+
+// ── ADMIN AUTHENTICATION ────────────────────────────────────────────
+app.post('/api/admin/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        console.log(`Login attempt for: ${email}`);
+        
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+
+        const token = jwt.sign(
+            { id: admin._id, email: admin.email, role: admin.role },
+            process.env.JWT_SECRET || 'secret',
+            { expiresIn: '24h' }
+        );
+
+        res.json({ success: true, token, admin: { email: admin.email, role: admin.role } });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+app.post('/api/admin/register', authMiddleware, async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const existing = await Admin.findOne({ email });
+        if (existing) {
+            return res.status(400).json({ success: false, message: 'Admin with this email already exists' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newAdmin = new Admin({ email, password: hashedPassword });
+        await newAdmin.save();
+
+        res.json({ success: true, message: 'Admin created successfully' });
+    } catch (error) {
+        console.error('Register error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+app.get('/api/admin/list', authMiddleware, async (req, res) => {
+    try {
+        const admins = await Admin.find({}, '-password').sort({ created_at: -1 });
+        res.json({ success: true, data: admins });
+    } catch (error) {
+        console.error('List admins error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
