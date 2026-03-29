@@ -32,10 +32,12 @@ async function connectToDatabase() {
 // Nodemailer Transporter Helper
 async function sendAutoReply(email, name, req_phone, req_query) {
     if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-        console.log('Skipping auto-reply: Gmail credentials not configured.');
+        console.error('❌ Skipping auto-reply: GMAIL_USER or GMAIL_PASS is missing in Vercel Environment Variables.');
         return;
     }
 
+    console.log(`✉️ Initializing transporter with user: ${process.env.GMAIL_USER}`);
+    
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
