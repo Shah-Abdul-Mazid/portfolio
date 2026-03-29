@@ -90,11 +90,6 @@ const Header = () => {
 
                     {/* Right Controls */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {/* Admin link - desktop only */}
-                        <Link to="/login/admin" className="admin-btn-desktop btn btn-secondary">
-                            ⚙ Admin
-                        </Link>
-
                         {/* Theme Toggle */}
                         <button onClick={toggleTheme} aria-label="Toggle theme" id="theme-toggle">
                             {isDarkMode ? (
@@ -154,12 +149,6 @@ const Header = () => {
                         ))}
                     </ul>
                 </nav>
-
-                <div className="mobile-drawer-footer">
-                    <Link to="/login/admin" className="btn btn-secondary" style={{ width: '100%', textAlign: 'center' }} onClick={closeMenu}>
-                        ⚙ Admin Panel
-                    </Link>
-                </div>
             </aside>
 
             <style>{`
@@ -175,14 +164,6 @@ const Header = () => {
                     flex-shrink: 0;
                 }
                 #theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
-
-                .admin-btn-desktop {
-                    font-size: 0.8125rem;
-                    padding: 6px 14px;
-                    border-radius: 100px;
-                    white-space: nowrap;
-                    text-decoration: none;
-                }
 
                 /* Desktop nav */
                 .nav-links-desktop {
@@ -240,10 +221,11 @@ const Header = () => {
                     background: rgba(0, 0, 0, 0.6);
                     z-index: 1100;
                     opacity: 0;
-                    transition: opacity 0.3s ease;
+                    visibility: hidden;
+                    transition: opacity 0.3s ease, visibility 0.3s ease;
                     backdrop-filter: blur(2px);
                 }
-                .mobile-backdrop.open { opacity: 1; }
+                .mobile-backdrop.open { opacity: 1; visibility: visible; }
 
                 /* Drawer */
                 .mobile-drawer {
@@ -298,12 +280,6 @@ const Header = () => {
                 .mobile-nav-link:hover { opacity: 1; background: rgba(139,92,246,0.08); color: var(--primary); }
                 .mobile-nav-link.active { opacity: 1; background: rgba(139,92,246,0.12); color: var(--primary); font-weight: 700; }
 
-                .mobile-drawer-footer {
-                    padding: 20px 24px;
-                    border-top: 1px solid var(--border-color);
-                    flex-shrink: 0;
-                }
-
                 @media (max-width: 1100px) {
                     .nav-links-desktop { gap: 0; }
                     .nav-link { font-size: 0.85rem; padding: 6px 9px; }
@@ -311,7 +287,6 @@ const Header = () => {
 
                 @media (max-width: 992px) {
                     .nav-links-desktop { display: none; }
-                    .admin-btn-desktop { display: none; }
                     .mobile-toggle { display: flex; }
                     .mobile-backdrop { display: block; }
                 }
