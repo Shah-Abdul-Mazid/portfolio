@@ -17,7 +17,12 @@ function App() {
             <BrowserRouter>
                 <TrackerWrapper>
                     <Routes>
-                        <Route path="/" element={<Portfolio />} />
+                        {/* Redirect root to admin login when launched as installed PWA */}
+                        <Route path="/" element={
+                            window.matchMedia('(display-mode: standalone)').matches
+                                ? <Navigate to="/login/admin" replace />
+                                : <Portfolio />
+                        } />
                         <Route path="/about" element={<Portfolio />} />
                         <Route path="/education" element={<Portfolio />} />
                         <Route path="/work" element={<Portfolio />} />
