@@ -94,8 +94,8 @@ async function sendAutoReply(email, name, req_phone, req_query) {
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
+        port: 465,
+        secure: true,
         family: 4, // Force IPv4
         auth: {
             user: process.env.GMAIL_USER,
