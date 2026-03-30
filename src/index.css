@@ -14,16 +14,16 @@
 }
 
 html.light-mode {
-    --bg-color: #f0f4f8; 
+    --bg-color: #f8fafc; 
     --text-color: #0f172a; 
     --text-secondary: #475569;
-    --primary: #0284c7; 
-    --primary-glow: rgba(2, 132, 199, 0.25);
-    --accent: #c026d3; 
-    --card-bg: rgba(255, 255, 255, 0.7); 
-    --border-color: rgba(2, 132, 199, 0.2);
-    --nav-bg: rgba(255, 255, 255, 0.85);
-    --gradient: linear-gradient(135deg, #0ea5e9, #6366f1, #d946ef);
+    --primary: #0369a1; 
+    --primary-glow: rgba(3, 105, 161, 0.25);
+    --accent: #be185d; 
+    --card-bg: rgba(255, 255, 255, 0.75); 
+    --border-color: rgba(3, 105, 161, 0.25);
+    --nav-bg: rgba(255, 255, 255, 0.9);
+    --gradient: linear-gradient(135deg, #0284c7, #4f46e5, #c026d3);
 }
 
 html {
