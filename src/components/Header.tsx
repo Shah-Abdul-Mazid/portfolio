@@ -18,7 +18,10 @@ const Header = () => {
     ];
 
     const [scrolled, setScrolled] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const saved = localStorage.getItem('theme');
+        return saved ? saved === 'dark' : true;
+    });
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
 
@@ -27,6 +30,17 @@ const Header = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Apply theme on mount and when it changes
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.add('light-mode');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [isDarkMode]);
 
     // Close menu on route change
     useEffect(() => {
@@ -41,7 +55,6 @@ const Header = () => {
 
     const toggleTheme = () => {
         setIsDarkMode(!isDarkMode);
-        document.body.classList.toggle('light-mode');
     };
 
     const closeMenu = () => setIsMenuOpen(false);

@@ -154,8 +154,10 @@ const IntelligenceMatrix: React.FC = () => {
             W = canvas.width; H = canvas.height;
             const cx = W / 2, cy = H * 0.42;
 
+            const isLight = document.documentElement.classList.contains('light-mode');
+
             // ─ Background ─────────────────────────────────────────────────
-            ctx.fillStyle = '#010612';
+            ctx.fillStyle = isLight ? '#f0f4f8' : '#010612';
             ctx.fillRect(0, 0, W, H);
 
             // ─ Nebula clouds (slow hue drift) ─────────────────────────────
@@ -169,8 +171,13 @@ const IntelligenceMatrix: React.FC = () => {
             ].forEach(n => {
                 const h = (n.hBase + hDrift) % 360;
                 const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
-                g.addColorStop(0, `hsla(${h},90%,62%,0.065)`);
-                g.addColorStop(0.5,`hsla(${h},80%,50%,0.025)`);
+                if (isLight) {
+                    g.addColorStop(0, `hsla(${h},70%,65%,0.10)`);
+                    g.addColorStop(0.5,`hsla(${h},60%,60%,0.04)`);
+                } else {
+                    g.addColorStop(0, `hsla(${h},90%,62%,0.065)`);
+                    g.addColorStop(0.5,`hsla(${h},80%,50%,0.025)`);
+                }
                 g.addColorStop(1, 'transparent');
                 ctx.fillStyle = g;
                 ctx.fillRect(0, 0, W, H);
@@ -182,7 +189,7 @@ const IntelligenceMatrix: React.FC = () => {
                 s.phase += s.speed;
                 const bright = 0.3 + Math.sin(s.phase) * 0.7;
                 ctx.globalAlpha = Math.max(0, bright) * (s.r > 1.2 ? 0.95 : 0.45);
-                ctx.fillStyle = s.color;
+                ctx.fillStyle = isLight ? '#94a3b8' : s.color;
                 ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
             });
             ctx.globalAlpha = 1;
@@ -244,8 +251,8 @@ const IntelligenceMatrix: React.FC = () => {
 
             // ─ Holographic perspective grid (lower third) ─────────────────
             ctx.save();
-            ctx.globalAlpha = 0.06;
-            ctx.strokeStyle = '#00f7ff';
+            ctx.globalAlpha = isLight ? 0.15 : 0.06;
+            ctx.strokeStyle = isLight ? '#0284c7' : '#00f7ff';
             ctx.lineWidth = 0.7;
             const gridH = H * 0.62;
             // Horizontal lines (squish toward horizon)
@@ -326,7 +333,7 @@ const IntelligenceMatrix: React.FC = () => {
                 // Label
                 ctx.globalAlpha = a * 0.52;
                 ctx.font = '9px "Courier New"';
-                ctx.fillStyle = n.color;
+                ctx.fillStyle = isLight ? '#0f172a' : n.color;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText(n.tag, n.x, n.y - n.size - 3);
@@ -471,12 +478,12 @@ const IntelligenceMatrix: React.FC = () => {
             if (scanY > H + 40) scanY = -40;
             const scanG = ctx.createLinearGradient(0, scanY - 20, 0, scanY + 20);
             scanG.addColorStop(0, 'transparent');
-            scanG.addColorStop(0.5, 'rgba(0, 247, 255, 0.04)');
+            scanG.addColorStop(0.5, isLight ? 'rgba(2, 132, 199, 0.08)' : 'rgba(0, 247, 255, 0.04)');
             scanG.addColorStop(1, 'transparent');
             ctx.fillStyle = scanG;
             ctx.fillRect(0, scanY - 20, W, 40);
             // Thin bright line at center of scan
-            ctx.strokeStyle = 'rgba(0, 247, 255, 0.06)';
+            ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.15)' : 'rgba(0, 247, 255, 0.06)';
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(W, scanY); ctx.stroke();
 
