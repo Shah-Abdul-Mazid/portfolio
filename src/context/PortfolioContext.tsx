@@ -171,38 +171,67 @@ const defaultData: PortfolioData = {
 
 interface PortfolioContextType {
     data: PortfolioData;
-    updateData: (newData: PortfolioData) => void;
+    updateData: (newData: PortfolioData) => Promise<void>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
+const API_BASE = '/api';
+
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [data, setData] = useState<PortfolioData>(defaultData);
 
+    // Load portfolio data: try DB first, then localStorage, then defaultData
     useEffect(() => {
-        const savedData = localStorage.getItem('portfolio_data');
-        if (savedData) {
+        const load = async () => {
             try {
-                const parsed = JSON.parse(savedData);
-                // Deep merge contact specifically to ensure new fields aren't lost if old data exists
-                setData({ 
-                    ...defaultData, 
-                    ...parsed,
-                    contact: {
-                        ...defaultData.contact,
-                        ...(parsed.contact || {})
+                const res = await fetch(`${API_BASE}/portfolio`);
+                if (res.ok) {
+                    const dbData = await res.json();
+                    if (dbData) {
+                        const merged = { ...defaultData, ...dbData, contact: { ...defaultData.contact, ...(dbData.contact || {}) } };
+                        setData(merged);
+                        localStorage.setItem('portfolio_data', JSON.stringify(merged));
+                        return;
                     }
-                });
-            } catch (error) {
-                console.error("Failed to parse portfolio data from localStorage");
-                setData(defaultData);
+                }
+            } catch {
+                console.warn('Backend unreachable, loading from localStorage...');
             }
-        }
+            // Fallback to localStorage cache
+            const saved = localStorage.getItem('portfolio_data');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    setData({ ...defaultData, ...parsed, contact: { ...defaultData.contact, ...(parsed.contact || {}) } });
+                } catch {
+                    setData(defaultData);
+                }
+            }
+        };
+        load();
     }, []);
 
-    const updateData = (newData: PortfolioData) => {
+    const updateData = async (newData: PortfolioData) => {
         setData(newData);
+        // Always save to localStorage as instant cache
         localStorage.setItem('portfolio_data', JSON.stringify(newData));
+        // Save to backend DB for cross-device sync
+        try {
+            const token = localStorage.getItem('admin_token');
+            const res = await fetch(`${API_BASE}/portfolio`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(newData)
+            });
+            if (!res.ok) console.warn('Failed to save portfolio to DB:', await res.text());
+            else console.log('✅ Portfolio synced to MongoDB');
+        } catch (err) {
+            console.warn('Could not reach backend to save portfolio data:', err);
+        }
     };
 
     return (

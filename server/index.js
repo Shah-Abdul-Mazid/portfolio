@@ -63,6 +63,14 @@ const AdminSchema = new mongoose.Schema({
 
 const Admin = mongoose.model('Admin', AdminSchema, process.env.atlas_ADMIN_COLLECTION || 'admin_db');
 
+// Portfolio CMS Content Schema
+const PortfolioContentSchema = new mongoose.Schema({
+    key: { type: String, default: 'main', unique: true },
+    data: { type: mongoose.Schema.Types.Mixed, required: true },
+    updated_at: { type: Date, default: Date.now }
+});
+const PortfolioContent = mongoose.model('PortfolioContent', PortfolioContentSchema, 'portfolio_content');
+
 // Middleware to verify JWT token
 const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
@@ -126,6 +134,36 @@ async function sendAutoReply(email, name, req_phone, req_query) {
 }
 
 // API Endpoints
+
+// ── PORTFOLIO CMS DATA ────────────────────────────────────────────
+// GET public portfolio data (used by frontend to load latest content)
+app.get('/api/portfolio', async (req, res) => {
+    try {
+        const doc = await PortfolioContent.findOne({ key: 'main' });
+        if (!doc) return res.json(null); // null = use default data
+        res.json(doc.data);
+    } catch (err) {
+        console.error('Error fetching portfolio data:', err.message);
+        res.status(500).json({ error: 'Failed to fetch portfolio data' });
+    }
+});
+
+// POST save portfolio data (admin only)
+app.post('/api/portfolio', authMiddleware, async (req, res) => {
+    try {
+        const doc = await PortfolioContent.findOneAndUpdate(
+            { key: 'main' },
+            { data: req.body, updated_at: new Date() },
+            { upsert: true, new: true }
+        );
+        console.log('✅ Portfolio data saved to MongoDB');
+        res.json({ success: true, updated_at: doc.updated_at });
+    } catch (err) {
+        console.error('Error saving portfolio data:', err.message);
+        res.status(500).json({ error: 'Failed to save portfolio data' });
+    }
+});
+
 // Post message
 app.post('/api/messages', async (req, res) => {
     console.log('📩 Incoming message request:', req.body);
