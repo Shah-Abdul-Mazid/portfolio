@@ -172,8 +172,10 @@ app.post('/api/messages', async (req, res) => {
         const savedMessage = await newMessage.save();
         console.log('✅ Message saved to MongoDB:', savedMessage._id);
         
-        // Send auto-reply before closing the connection
-        await sendAutoReply(req.body.email, req.body.name, req.body.phone, req.body.query);
+        // Trigger emails in background (non-blocking) so the UI doesn't hang
+        sendAutoReply(req.body.email, req.body.name, req.body.phone, req.body.query)
+            .then(() => console.log('Background email process finished.'))
+            .catch(console.error);
         
         res.status(201).json(savedMessage);
     } catch (err) {
