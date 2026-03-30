@@ -8,8 +8,14 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
         <section id="education" className="section alt-bg">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">Education</span>
-                    <h2>My Academic <span className="gradient-text">Journey</span></h2>
+                    <span className="subtitle">{data.sections?.education?.subtitle || 'Education'}</span>
+                    <h2>
+                        {data.sections?.education?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.education.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>My Academic <span className="gradient-text">Journey</span></>
+                        )}
+                    </h2>
                 </div>
                 <div className="timeline">
                     {education.map((item, index) => (

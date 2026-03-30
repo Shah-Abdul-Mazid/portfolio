@@ -15,8 +15,14 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
         <section id="papers" className="section alt-bg">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">Publications</span>
-                    <h2>Research <span className="gradient-text">Papers</span></h2>
+                    <span className="subtitle">{data.sections?.papers?.subtitle || 'Publications'}</span>
+                    <h2>
+                        {data.sections?.papers?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.papers.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>Research <span className="gradient-text">Papers</span></>
+                        )}
+                    </h2>
                 </div>
                 <div className="papers-grid">
                     {displayedPapers.map((paper, index) => (

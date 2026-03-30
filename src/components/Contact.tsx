@@ -42,8 +42,14 @@ const Contact = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void })
         <section id="contact" className="section">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">Contact</span>
-                    <h2>Let's Start a <span className="gradient-text">Conversation</span></h2>
+                    <span className="subtitle">{data.sections?.contact?.subtitle || 'Contact'}</span>
+                    <h2>
+                        {data.sections?.contact?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.contact.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>Let's Start a <span className="gradient-text">Conversation</span></>
+                        )}
+                    </h2>
                 </div>
 
                 <div className="contact-grid">

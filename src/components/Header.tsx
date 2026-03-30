@@ -2,18 +2,21 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import avtarImg from '../assets/avtar.png';
 
-const navLinks = [
-    { to: '/about', label: 'About' },
-    { to: '/education', label: 'Education' },
-    { to: '/work', label: 'Experience' },
-    { to: '/achievements', label: 'Achievements' },
-    { to: '/skills', label: 'Skills' },
-    { to: '/projects', label: 'Projects' },
-    { to: '/papers', label: 'Research' },
-    { to: '/contact', label: 'Contact' },
-];
+import { usePortfolio } from '../context/PortfolioContext';
 
 const Header = () => {
+    const { data } = usePortfolio();
+    const navLinks = [
+        { to: '/about', label: data.sections?.about?.navLabel || 'About' },
+        { to: '/education', label: data.sections?.education?.navLabel || 'Education' },
+        { to: '/work', label: data.sections?.work?.navLabel || 'Experience' },
+        { to: '/achievements', label: data.sections?.experience?.navLabel || 'Achievements' },
+        { to: '/skills', label: data.sections?.skills?.navLabel || 'Skills' },
+        { to: '/projects', label: data.sections?.projects?.navLabel || 'Projects' },
+        { to: '/papers', label: data.sections?.papers?.navLabel || 'Research' },
+        { to: '/contact', label: data.sections?.contact?.navLabel || 'Contact' },
+    ];
+
     const [scrolled, setScrolled] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);

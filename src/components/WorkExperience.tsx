@@ -9,8 +9,14 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
         <section id="work" className="section alt-bg">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">Career Journey</span>
-                    <h2>Professional <span className="gradient-text">Experience</span></h2>
+                    <span className="subtitle">{data.sections?.work?.subtitle || 'Career Journey'}</span>
+                    <h2>
+                        {data.sections?.work?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.work.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>Professional <span className="gradient-text">Experience</span></>
+                        )}
+                    </h2>
                 </div>
                 
                 <div className="work-timeline">

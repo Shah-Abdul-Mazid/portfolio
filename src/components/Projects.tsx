@@ -33,8 +33,14 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         <section id="projects" className="section alt-bg" style={{ overflow: 'hidden' }}>
             <div className="container" style={{ maxWidth: '100%', padding: '0' }}>
                 <div className="section-title fade-in" ref={addToRefs} style={{ textAlign: 'center' }}>
-                    <span className="subtitle">Projects</span>
-                    <h2>Featured <span className="gradient-text">Projects</span></h2>
+                    <span className="subtitle">{data.sections?.projects?.subtitle || 'Projects'}</span>
+                    <h2>
+                        {data.sections?.projects?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.projects.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>Featured <span className="gradient-text">Projects</span></>
+                        )}
+                    </h2>
                 </div>
                 <div className="showcase-slider fade-in" ref={addToRefs}>
                     <div className="slider-container">

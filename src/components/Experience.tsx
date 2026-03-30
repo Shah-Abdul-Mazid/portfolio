@@ -8,8 +8,14 @@ const Experience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void
         <section id="achievements" className="section">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">Achievements</span>
-                    <h2>Hackathons & <span className="gradient-text">Competitions</span></h2>
+                    <span className="subtitle">{data.sections?.experience?.subtitle || 'Achievements'}</span>
+                    <h2>
+                        {data.sections?.experience?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.experience.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>Hackathons & <span className="gradient-text">Competitions</span></>
+                        )}
+                    </h2>
                 </div>
                 <div className="exp-grid">
                     {competitions.map((items, index) => (

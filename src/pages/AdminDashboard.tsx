@@ -229,15 +229,48 @@ const AdminDashboard = () => {
     };
 
     const navItems = [
-        { id: 'profile', icon: '🏠', label: 'Intro & Profile' },
-        { id: 'projects', icon: '🚀', label: 'Portfolio' },
-        { id: 'skills', icon: '💻', label: 'Tech Stack' },
-        { id: 'education', icon: '🎓', label: 'Education' },
-        { id: 'work', icon: '💼', label: 'Work History' },
-        { id: 'experience', icon: '🏆', label: 'Achievements' },
-        { id: 'papers', icon: '📄', label: 'Research Papers' },
-        { id: 'contact', icon: '📞', label: 'Contact Details' },
+        { id: 'profile', icon: '🏠', label: editData.sections?.about?.adminLabel || 'Intro & Profile' },
+        { id: 'projects', icon: '🚀', label: editData.sections?.projects?.adminLabel || 'Portfolio' },
+        { id: 'skills', icon: '💻', label: editData.sections?.skills?.adminLabel || 'Tech Stack' },
+        { id: 'education', icon: '🎓', label: editData.sections?.education?.adminLabel || 'Education' },
+        { id: 'work', icon: '💼', label: editData.sections?.work?.adminLabel || 'Work History' },
+        { id: 'experience', icon: '🏆', label: editData.sections?.experience?.adminLabel || 'Achievements' },
+        { id: 'papers', icon: '📄', label: editData.sections?.papers?.adminLabel || 'Research Papers' },
+        { id: 'contact', icon: '📞', label: editData.sections?.contact?.adminLabel || 'Contact Details' },
     ];
+
+    const SectionConfigPanel = ({ sectionKey }: { sectionKey: keyof typeof editData.sections }) => {
+        const config = editData.sections?.[sectionKey] || { navLabel: '', adminLabel: '', title: '', subtitle: '' };
+        return (
+            <div className="form-section" style={{ borderLeft: '3px solid #3b82f6', background: 'rgba(59,130,246,0.03)' }}>
+                <h4 className="section-label">Section Display Settings</h4>
+                <div className="flex-group">
+                     <div className="form-group w-50">
+                         <label>Site Navigation Label</label>
+                         <input type="text" value={config.navLabel || ''} 
+                             onChange={e => setEditData({...editData, sections: {...editData.sections, [sectionKey]: {...config, navLabel: e.target.value}}})} />
+                     </div>
+                     <div className="form-group w-50">
+                         <label>Admin Menu Label</label>
+                         <input type="text" value={config.adminLabel || ''} 
+                             onChange={e => setEditData({...editData, sections: {...editData.sections, [sectionKey]: {...config, adminLabel: e.target.value}}})} />
+                     </div>
+                </div>
+                <div className="flex-group">
+                     <div className="form-group w-50">
+                         <label>Main Title</label>
+                         <input type="text" value={config.title || ''} 
+                             onChange={e => setEditData({...editData, sections: {...editData.sections, [sectionKey]: {...config, title: e.target.value}}})} />
+                     </div>
+                     <div className="form-group w-50">
+                         <label>Subtitle / Tagline</label>
+                         <input type="text" value={config.subtitle || ''} 
+                             onChange={e => setEditData({...editData, sections: {...editData.sections, [sectionKey]: {...config, subtitle: e.target.value}}})} />
+                     </div>
+                </div>
+            </div>
+        );
+    };
 
     const SaveBar = () => (
         <div className="pane-header">
@@ -379,6 +412,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="about" />
 
                             <div className="form-section">
                                 <h4 className="section-label">Hero Banner</h4>
@@ -429,6 +463,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="education" />
                             {editData.education.map((item: EducationItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
@@ -468,6 +503,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="work" />
                             {editData.work.map((job: WorkItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
@@ -521,6 +557,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="experience" />
                             {editData.experience.map((item: ExperienceItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
@@ -560,6 +597,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="skills" />
                             {editData.skills.map((cat: SkillCategory, ci: number) => (
                                 <div key={ci} className="form-section item-card">
                                     <div className="item-card-header">
@@ -598,6 +636,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="projects" />
                             {editData.projects.map((project: ProjectItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
@@ -655,6 +694,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="papers" />
                             {editData.papers.map((paper: PaperItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
@@ -712,6 +752,7 @@ const AdminDashboard = () => {
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="contact" />
 
                             <div className="form-section">
                                 <h4 className="section-label">General Contact</h4>

@@ -8,8 +8,14 @@ const Skills = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
         <section id="skills" className="section alt-bg">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">Technical Stack</span>
-                    <h2>Core <span className="gradient-text">Expertise</span></h2>
+                    <span className="subtitle">{data.sections?.skills?.subtitle || 'Technical Stack'}</span>
+                    <h2>
+                        {data.sections?.skills?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.skills.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>Core <span className="gradient-text">Expertise</span></>
+                        )}
+                    </h2>
                 </div>
                 
                 <div className="skills-marquee-container">

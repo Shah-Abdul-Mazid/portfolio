@@ -1,16 +1,6 @@
 import { usePortfolio } from '../context/PortfolioContext';
 import avtarImg from '../assets/avtar.png';
 
-const DOB = new Date(2001, 5, 1); // June 1, 2001
-
-const getAge = () => {
-    const now = new Date();
-    let years = now.getFullYear() - DOB.getFullYear();
-    let months = now.getMonth() - DOB.getMonth();
-    if (months < 0) { years--; months += 12; }
-    return `${years} years`;
-};
-
 const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
 
@@ -18,9 +8,13 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
         <section id="about" className="about-modern section">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">About Me</span>
+                    <span className="subtitle">{data.sections?.about?.subtitle || 'About Me'}</span>
                     <h2 className="about-title">
-                        A Digital Craftsman with a <span className="gradient-text">Passion</span>
+                        {data.sections?.about?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: data.sections.about.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                        ) : (
+                            <>A Digital Craftsman with a <span className="gradient-text">Passion</span></>
+                        )}
                     </h2>
                 </div>
 
@@ -36,7 +30,7 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
 
                         <div className="about-stats">
                             <div className="stat">
-                                <span className="number">{getAge()}</span>
+                                <span className="number">{data.about.age}</span>
                                 <span className="label">Age</span>
                             </div>
                             <div className="stat">

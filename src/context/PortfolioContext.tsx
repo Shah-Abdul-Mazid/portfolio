@@ -43,7 +43,24 @@ export interface PaperItem {
     doi: string;
 }
 
+export interface SectionConfig {
+    navLabel: string;
+    adminLabel: string;
+    subtitle: string;
+    title: string;
+}
+
 export interface PortfolioData {
+    sections: {
+        about: SectionConfig;
+        education: SectionConfig;
+        work: SectionConfig;
+        experience: SectionConfig;
+        skills: SectionConfig;
+        projects: SectionConfig;
+        papers: SectionConfig;
+        contact: SectionConfig;
+    };
     hero: {
         name: string;
         title: string;
@@ -71,6 +88,16 @@ export interface PortfolioData {
 }
 
 const defaultData: PortfolioData = {
+    sections: {
+        about: { navLabel: 'About', adminLabel: 'Intro & Profile', subtitle: 'About Me', title: 'A Digital Craftsman with a Passion' },
+        education: { navLabel: 'Education', adminLabel: 'Education', subtitle: 'Education', title: 'My Academic Journey' },
+        work: { navLabel: 'Experience', adminLabel: 'Work History', subtitle: 'Career Journey', title: 'Professional Experience' },
+        experience: { navLabel: 'Achievements', adminLabel: 'Achievements', subtitle: 'Achievements', title: 'Hackathons & Competitions' },
+        skills: { navLabel: 'Skills', adminLabel: 'Tech Stack', subtitle: 'Technical Stack', title: 'Core Expertise' },
+        projects: { navLabel: 'Projects', adminLabel: 'Portfolio', subtitle: 'Projects', title: 'Featured Projects' },
+        papers: { navLabel: 'Research', adminLabel: 'Research Papers', subtitle: 'Publications', title: 'Research Papers' },
+        contact: { navLabel: 'Contact', adminLabel: 'Contact Details', subtitle: 'Contact', title: 'Let\'s Start a Conversation' }
+    },
     hero: {
         name: "Shah Abdul Mazid",
         title: "Machine Learning Researcher & Software Engineer",
@@ -189,7 +216,12 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                 if (res.ok) {
                     const dbData = await res.json();
                     if (dbData) {
-                        const merged = { ...defaultData, ...dbData, contact: { ...defaultData.contact, ...(dbData.contact || {}) } };
+                        const merged = { 
+                            ...defaultData, 
+                            ...dbData, 
+                            sections: { ...defaultData.sections, ...(dbData.sections || {}) },
+                            contact: { ...defaultData.contact, ...(dbData.contact || {}) } 
+                        };
                         setData(merged);
                         localStorage.setItem('portfolio_data', JSON.stringify(merged));
                         return;
@@ -203,7 +235,12 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    setData({ ...defaultData, ...parsed, contact: { ...defaultData.contact, ...(parsed.contact || {}) } });
+                    setData({ 
+                        ...defaultData, 
+                        ...parsed, 
+                        sections: { ...defaultData.sections, ...(parsed.sections || {}) },
+                        contact: { ...defaultData.contact, ...(parsed.contact || {}) } 
+                    });
                 } catch {
                     setData(defaultData);
                 }
