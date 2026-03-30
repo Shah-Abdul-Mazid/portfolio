@@ -45,7 +45,7 @@ const MessageSchema = new mongoose.Schema({
     created_at: { type: Date, default: Date.now }
 });
 
-const Message = mongoose.model('Message', MessageSchema, process.env.atlas_COLLECTION_NAME);
+const Message = mongoose.model('Message', MessageSchema, process.env.atlas_COLLECTION_NAME2 || 'messages');
 
 const AnalyticsSchema = new mongoose.Schema({
     id: { type: String, unique: true, required: true },
@@ -61,7 +61,7 @@ const AdminSchema = new mongoose.Schema({
     created_at: { type: Date, default: Date.now }
 });
 
-const Admin = mongoose.model('Admin', AdminSchema, process.env.atlas_ADMIN_COLLECTION || 'admin_db');
+const Admin = mongoose.model('Admin', AdminSchema, process.env.atlas_COLLECTION_NAME1 || 'admin_db');
 
 // Portfolio CMS Content Schema
 const PortfolioContentSchema = new mongoose.Schema({
@@ -69,7 +69,7 @@ const PortfolioContentSchema = new mongoose.Schema({
     data: { type: mongoose.Schema.Types.Mixed, required: true },
     updated_at: { type: Date, default: Date.now }
 });
-const PortfolioContent = mongoose.model('PortfolioContent', PortfolioContentSchema, 'portfolio_content');
+const PortfolioContent = mongoose.model('PortfolioContent', PortfolioContentSchema, process.env.atlas_COLLECTION_NAME3 || 'portfolio_content');
 
 // Middleware to verify JWT token
 const authMiddleware = (req, res, next) => {
