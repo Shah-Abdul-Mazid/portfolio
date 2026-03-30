@@ -34,10 +34,13 @@ export interface ProjectItem {
     showcase: number;
 }
 
-export interface BlogItem {
+export interface PaperItem {
     title: string;
-    date: string;
-    category: string;
+    authors: string;
+    venue: string;
+    year: string;
+    keywords: string;
+    doi: string;
 }
 
 export interface PortfolioData {
@@ -56,7 +59,7 @@ export interface PortfolioData {
     experience: ExperienceItem[];
     work: WorkItem[];
     projects: ProjectItem[];
-    blog: BlogItem[];
+    papers: PaperItem[];
     contact: {
         email: string;
         phone: string;
@@ -106,9 +109,55 @@ const defaultData: PortfolioData = {
         { title: 'Hate Speech Detection from Live Stream', desc: 'This project implements a real-time hate speech detection system for live audio streams using BERT, PyAudio, and TensorFlow.', tags: ['BERT', 'PyAudio', 'TensorFlow'], showcase: 5 },
         { title: 'Mechanical Glove Mouse: Motion-Based Control', desc: 'Motion-controlled wireless glove mouse for human-computer interaction using ESP32-S3 and MPU6050 sensor.', tags: ['ESP32-S3', 'MPU6050', 'Arduino IDE'], showcase: 6 }
     ],
-    blog: [
-        { title: 'The Future of Web Development', date: 'Mar 15, 2024', category: 'Tech' },
-        { title: 'Mastering React Performance', date: 'Feb 28, 2024', category: 'Coding' }
+    papers: [
+        { 
+            title: 'A Review on Papaya Leaf and Fruit Disease Classification Techniques', 
+            authors: 'Rank, Yashkumar and Sutariya, Kruti', 
+            venue: '3rd International Conference on Automation, Computing and Renewable Systems (ICACRS)', 
+            year: '2024', 
+            keywords: 'Precision agriculture;Papaya Disease;Machine Learning;Vision Transformers', 
+            doi: '10.1109/ICACRS62842.2024.10841766' 
+        },
+        { 
+            title: 'Real-Time Hate Speech Detection using Bidirectional Transformer Representations', 
+            authors: 'Mazid, Shah Abdul and Rahaman, Md.', 
+            venue: 'International Journal of advanced Computer Science and Applications', 
+            year: '2023', 
+            keywords: 'NLP;BERT;Audio Streams;TensorFlow;Hate Speech', 
+            doi: '10.14569/IJACSA.2023.141201' 
+        },
+        { 
+            title: 'VAID: A Novel High-Altitude Aerial Image Dataset for Vehicle Detection', 
+            authors: 'Mazid, Shah Abdul', 
+            venue: 'IEEE Transactions on Geoscience and Remote Sensing', 
+            year: '2023', 
+            keywords: 'Computer Vision;Aerial Imaging;Vehicle Detection;Dataset', 
+            doi: '10.1109/TGRS.2023.1023948' 
+        },
+        { 
+            title: 'Optimizing Mechanical Glove Mouse Control Systems via Motion Sensors', 
+            authors: 'Mazid, Shah Abdul and Hasan, K.', 
+            venue: 'Conference on Human-Computer Interaction', 
+            year: '2022', 
+            keywords: 'HCI;ESP32;MPU6050;Hardware Integration', 
+            doi: '10.1145/3544548.3581234' 
+        },
+        { 
+            title: 'Dynamic Customer Support Automation using Large Language Models', 
+            authors: 'Mazid, Shah Abdul', 
+            venue: 'Journal of Artificial Intelligence Research', 
+            year: '2024', 
+            keywords: 'LLMs;OpenAI;Pinecone;n8n;E-Commerce', 
+            doi: '10.1613/jair.1.13221' 
+        },
+        { 
+            title: 'A Framework for Competitive Intelligence Workflow Automation via Web Scraping', 
+            authors: 'Mazid, Shah Abdul and Ahmed, S.', 
+            venue: 'International Conference on Data Mining', 
+            year: '2023', 
+            keywords: 'Data Mining;Web Scraping;Jungle Scout;Automation', 
+            doi: '10.1109/ICDM50133.2023.0039' 
+        }
     ],
     contact: {
         email: "shahabdulmazid.ezan@yahoo.com",

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus } from 'lucide-react';
-import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, BlogItem, SkillCategory } from '../context/PortfolioContext';
+import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -18,6 +18,34 @@ const AdminDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [newAdminEmail, setNewAdminEmail] = useState('');
     const [newAdminPassword, setNewAdminPassword] = useState('');
+    const [bibtexInputs, setBibtexInputs] = useState<{[key:number]:string}>({});
+
+    const handleParseBibtex = (index: number) => {
+        const str = bibtexInputs[index] || '';
+        const extract = (key: string) => {
+            const re = new RegExp(`${key}\\s*=\\s*\\{([^\\}]+)\\}`, 'i');
+            const match = str.match(re);
+            return match ? match[1].replace(/[\r\n]+/g, ' ').trim() : '';
+        };
+        setEditData(prev => {
+            const papers = [...prev.papers];
+            const title = extract('title');
+            if (title) papers[index].title = title;
+            const authors = extract('author');
+            if (authors) papers[index].authors = authors;
+            const venue = extract('booktitle') || extract('journal');
+            if (venue) papers[index].venue = venue;
+            const year = extract('year');
+            if (year) papers[index].year = year;
+            const keywords = extract('keywords');
+            if (keywords) papers[index].keywords = keywords;
+            const doi = extract('doi');
+            if (doi) papers[index].doi = doi;
+            return { ...prev, papers };
+        });
+        setSaveStatus('BibTeX Extracted!');
+        setTimeout(()=>setSaveStatus(''), 2000);
+    };
 
     useEffect(() => {
         if (localStorage.getItem('admin_auth') !== 'true') {
@@ -207,7 +235,7 @@ const AdminDashboard = () => {
         { id: 'education', icon: '🎓', label: 'Education' },
         { id: 'work', icon: '💼', label: 'Work History' },
         { id: 'experience', icon: '🏆', label: 'Achievements' },
-        { id: 'blog', icon: '📝', label: 'Journal' },
+        { id: 'papers', icon: '📄', label: 'Research Papers' },
         { id: 'contact', icon: '📞', label: 'Contact Details' },
     ];
 
@@ -622,36 +650,59 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── BLOG / JOURNAL ────────────────────────────────────── */}
-                    {activeTab === 'blog' && (
+                    {/* ── RESEARCH PAPERS ────────────────────────────────────── */}
+                    {activeTab === 'papers' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
-                            {editData.blog.map((post: BlogItem, i: number) => (
+                            {editData.papers.map((paper: PaperItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
-                                        <h4 className="section-label">Post #{i + 1}</h4>
-                                        <button className="remove-btn" onClick={() => removeListItem('blog', i)}><Minus size={14} /> Remove</button>
+                                        <h4 className="section-label">Paper #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('papers', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    
+                                    <div className="form-group" style={{ background: 'rgba(59,130,246,0.05)', padding: '16px', borderRadius: '12px', border: '1px dashed rgba(59,130,246,0.3)' }}>
+                                        <label style={{ color: '#3b82f6' }}>✨ Option 1: Auto-Fill via BibTeX</label>
+                                        <textarea rows={4} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} placeholder="@INPROCEEDINGS{..."
+                                            value={bibtexInputs[i] || ''} onChange={e => setBibtexInputs({...bibtexInputs, [i]: e.target.value})} 
+                                        />
+                                        <button className="btn-small btn-secondary" style={{ marginTop: '8px' }} onClick={() => handleParseBibtex(i)}>Parse & Autofill</button>
+                                    </div>
+
+                                    <h5 style={{ margin: '24px 0 16px', fontSize: '0.85rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Option 2: Manual Entry</h5>
+                                    <div className="form-group">
+                                        <label>Paper Title</label>
+                                        <input type="text" value={paper.title} onChange={e => updateListItem('papers', i, 'title', e.target.value)} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Authors</label>
+                                        <input type="text" value={paper.authors} onChange={e => updateListItem('papers', i, 'authors', e.target.value)} />
                                     </div>
                                     <div className="flex-group">
                                         <div className="form-group w-50">
-                                            <label>Post Title</label>
-                                            <input type="text" value={post.title} onChange={e => updateListItem('blog', i, 'title', e.target.value)} />
+                                            <label>Venue (Journal / Conf)</label>
+                                            <input type="text" value={paper.venue} onChange={e => updateListItem('papers', i, 'venue', e.target.value)} />
                                         </div>
                                         <div className="form-group w-50">
-                                            <label>Category</label>
-                                            <input type="text" value={post.category} onChange={e => updateListItem('blog', i, 'category', e.target.value)} />
+                                            <label>Year</label>
+                                            <input type="text" value={paper.year} onChange={e => updateListItem('papers', i, 'year', e.target.value)} />
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label>Date</label>
-                                        <input type="text" value={post.date} placeholder="e.g. Mar 15, 2024"
-                                            onChange={e => updateListItem('blog', i, 'date', e.target.value)} />
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Keywords</label>
+                                            <input type="text" value={paper.keywords} onChange={e => updateListItem('papers', i, 'keywords', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>DOI / URL</label>
+                                            <input type="text" value={paper.doi} onChange={e => updateListItem('papers', i, 'doi', e.target.value)} />
+                                        </div>
                                     </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('blog', { title: '', date: '', category: '' })}>
-                                <Plus size={16} /> Add Post
+                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '' })}>
+                                <Plus size={16} /> Add Research Paper
                             </button>
                         </div>
                     )}

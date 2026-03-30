@@ -5,7 +5,7 @@ import Education from '../components/Education';
 import Experience from '../components/Experience';
 import Skills from '../components/Skills';
 import Projects from '../components/Projects';
-import Blog from '../components/Blog';
+import Papers from '../components/Papers';
 import WorkExperience from '../components/WorkExperience';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
@@ -24,7 +24,7 @@ const SECTION_ROUTES: Record<string, string> = {
     'achievements': '/achievements',
     'skills':       '/skills',
     'projects':     '/projects',
-    'blog':         '/blog',
+    'papers':       '/papers',
     'contact':      '/contact',
 };
 
@@ -85,7 +85,7 @@ const Portfolio = () => {
                 <Experience addToRefs={addToRefs} />
                 <Skills addToRefs={addToRefs} />
                 <Projects addToRefs={addToRefs} />
-                <Blog addToRefs={addToRefs} />
+                <Papers addToRefs={addToRefs} />
                 <Contact addToRefs={addToRefs} />
             </main>
             <Footer />

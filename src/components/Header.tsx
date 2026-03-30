@@ -9,7 +9,7 @@ const navLinks = [
     { to: '/achievements', label: 'Achievements' },
     { to: '/skills', label: 'Skills' },
     { to: '/projects', label: 'Projects' },
-    { to: '/blog', label: 'Blog' },
+    { to: '/papers', label: 'Research' },
     { to: '/contact', label: 'Contact' },
 ];
 
