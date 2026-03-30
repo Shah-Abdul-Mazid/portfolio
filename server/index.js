@@ -172,8 +172,8 @@ app.post('/api/messages', async (req, res) => {
         const savedMessage = await newMessage.save();
         console.log('✅ Message saved to MongoDB:', savedMessage._id);
         
-        // Trigger emails in background
-        sendAutoReply(req.body.email, req.body.name, req.body.phone, req.body.query).catch(console.error);
+        // Send auto-reply before closing the connection
+        await sendAutoReply(req.body.email, req.body.name, req.body.phone, req.body.query);
         
         res.status(201).json(savedMessage);
     } catch (err) {
