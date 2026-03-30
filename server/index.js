@@ -85,51 +85,44 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-// Nodemailer Transporter Helper
+// EmailJS API Helper
 async function sendAutoReply(email, name, req_phone, req_query) {
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-        console.log('Skipping auto-reply: Gmail credentials not configured in .env.');
+    const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+    const privateKey = process.env.EMAILJS_PRIVATE_KEY;
+    const serviceId = process.env.EMAILJS_SERVICE_ID;
+    const templateId = process.env.EMAILJS_TEMPLATE_ID;
+
+    if (!publicKey || !serviceId || !templateId) {
+        console.log('Skipping auto-reply: EmailJS credentials not fully configured in env.');
         return;
     }
 
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        family: 4, // Force IPv4
-        auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
-
-    const mailOptions = {
-        from: `"Portfolio Support" <${process.env.GMAIL_USER}>`,
-        to: email,
-        subject: 'Thank you for your message!',
-        html: `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 20px auto; padding: 40px; border: 1px solid #eee; border-top: 4px solid #007bff; color: #333; line-height: 1.6; background-color: #fff;">
-                <h2 style="font-weight: 700; font-size: 24px; margin-top: 0; color: #333;">Hello ${name},</h2>
-                <p style="margin-bottom: 24px; font-size: 16px;">I hope this email finds you well!</p>
-                <p style="margin-bottom: 24px; font-size: 16px;">This is an automated confirmation to let you know that I've successfully received your message through my portfolio's contact form.</p>
-                <p style="margin-bottom: 24px; font-size: 16px;">I truly appreciate you reaching out and will get back to you as soon as possible.</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 32px 0;">
-                <p style="margin: 0; color: #666; font-size: 16px;">Best regards,</p>
-                <p style="margin: 4px 0 0 0; font-weight: 700; color: #333; font-size: 18px;">Shah Abdul Mazid</p>
-            </div>
-        `
-    };
-
-    console.log(`✉️ Preparing auto-reply for: ${name} (${email})`);
+    console.log(`✉️ Sending EmailJS auto-reply to: ${name} (${email})`);
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Auto-reply sent successfully to ${email}`);
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                service_id: serviceId,
+                template_id: templateId,
+                user_id: publicKey,
+                accessToken: privateKey,
+                template_params: {
+                    to_name: name,
+                    to_email: email
+                }
+            })
+        });
+
+        if (response.ok) {
+            console.log(`✅ Auto-reply sent successfully via EmailJS to ${email}`);
+        } else {
+            const errText = await response.text();
+            console.error('❌ EmailJS Error:', errText);
+        }
     } catch (error) {
-        console.error('❌ Error sending auto-reply:', error);
+        console.error('❌ Error hitting EmailJS API:', error);
     }
 }
 
