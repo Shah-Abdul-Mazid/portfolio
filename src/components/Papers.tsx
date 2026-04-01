@@ -1,11 +1,19 @@
 import { useState } from 'react';
+import type { MouseEvent } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, FileText, Image as ImageIcon } from 'lucide-react';
 
 const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
     const papers = data.papers || [];
     const [showAll, setShowAll] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<string | null>(null);
+
+    const closeModal = (e: MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            setSelectedFile(null);
+        }
+    };
 
     if (papers.length === 0) return null;
 
@@ -43,15 +51,27 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                                     </div>
                                 )}
                             </div>
-                            {paper.doi && (
-                                <div className="paper-actions">
+                            <div className="paper-actions">
+                                {paper.doi && (
                                     <a href={paper.doi.startsWith('http') ? paper.doi : `https://doi.org/${paper.doi}`} 
                                        target="_blank" rel="noreferrer" className="attachment-link">
                                         <ExternalLink size={14} style={{ marginRight: '6px' }} />
                                         Read Paper
                                     </a>
-                                </div>
-                            )}
+                                )}
+                                {paper.documentUrl && (
+                                    <button onClick={() => setSelectedFile(paper.documentUrl as string)} className="attachment-link">
+                                        <FileText size={14} style={{ marginRight: '6px' }} />
+                                        Preview PDF
+                                    </button>
+                                )}
+                                {paper.certificateUrl && (
+                                    <button onClick={() => setSelectedFile(paper.certificateUrl as string)} className="attachment-link">
+                                        <ImageIcon size={14} style={{ marginRight: '6px' }} />
+                                        Certificate
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -68,6 +88,19 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     </div>
                 )}
             </div>
+
+            {selectedFile && (
+                <div className="image-modal-overlay" onClick={closeModal}>
+                    <div className="image-modal-content">
+                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>✖</button>
+                        {selectedFile.toLowerCase().endsWith('.pdf') ? (
+                            <iframe src={selectedFile} className="pdf-viewer" title="Document Viewer" />
+                        ) : (
+                            <img src={selectedFile} alt="Fullscreen View" className="fullscreen-image" />
+                        )}
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 .papers-grid { 
@@ -104,7 +137,7 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     flex-wrap: wrap;
                 }
                 .paper-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.05); }
-                .attachment-link { display: inline-flex; align-items: center; background: rgba(139, 92, 246, 0.08); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(139, 92, 246, 0.15); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; width: 100%; justify-content: center; }
+                .attachment-link { display: inline-flex; align-items: center; background: rgba(139, 92, 246, 0.08); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(139, 92, 246, 0.15); transition: all 0.3s ease; cursor: pointer; }
                 .attachment-link:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
                 
                 .paper-meta .venue {
@@ -143,6 +176,13 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     border-radius: 100px;
                     color: var(--text-muted);
                 }
+
+                .image-modal-overlay { position: fixed; inset: 0; background: rgba(3,7,18,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 40px; animation: modalFadeIn 0.3s ease-out; }
+                .image-modal-content { position: relative; max-width: 1200px; width: 100%; max-height: 90vh; background: #0f172a; border-radius: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+                .close-modal-btn { position: absolute; top: -16px; right: -16px; width: 32px; height: 32px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000; }
+                .fullscreen-image { width: 100%; height: 100%; max-height: calc(90vh - 24px); object-fit: contain; }
+                .pdf-viewer { width: 100%; height: calc(90vh - 24px); border: none; border-radius: 8px; background: white; }
+                @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
                 
                 @media (max-width: 1200px) {
                     .papers-grid { grid-template-columns: repeat(3, 1fr); }
@@ -152,6 +192,7 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                 }
                 @media (max-width: 600px) {
                     .papers-grid { grid-template-columns: 1fr; }
+                    .image-modal-overlay { padding: 16px; }
                 }
             `}</style>
         </section>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, FileText, CheckCircle, Users } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 
 const AdminDashboard = () => {
@@ -13,6 +13,7 @@ const AdminDashboard = () => {
     
     const [stats, setStats] = useState({ views: 0, messages: 0, admins: 0 });
     const [messages, setMessages] = useState<any[]>([]);
+    const [visitors, setVisitors] = useState<any[]>([]);
     const [adminsList, setAdminsList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -100,6 +101,37 @@ const AdminDashboard = () => {
             fetchRealTimeData();
         } catch { alert('Failed to delete message'); }
     };
+
+    const fetchVisitors = async () => {
+        try {
+            const res = await fetch('/api/analytics/visitors');
+            const data = await res.json();
+            setVisitors(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error('Failed to load visitors');
+        }
+    };
+
+    const handleClearVisitors = async () => {
+        if (!window.confirm('Are you sure you want to delete all visitor records and reset the view count to 0?')) return;
+        try {
+            const res = await fetch('/api/analytics/clear', { method: 'POST' });
+            const result = await res.json();
+            if (result.success) {
+                setVisitors([]);
+                setStats(prev => ({ ...prev, views: 0 }));
+                alert(result.message);
+            }
+        } catch (err) {
+            alert('Failed to clear visitors');
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === 'visitors') {
+            fetchVisitors();
+        }
+    }, [activeTab]);
 
     const handleLogout = () => {
         localStorage.removeItem('admin_auth');
@@ -230,6 +262,130 @@ const AdminDashboard = () => {
 
 
 
+
+    const FileUploadInput = ({ label, value, onUpload, id, placeholder = "Enter URL or upload file" }: { 
+        label: string, 
+        value: string, 
+        onUpload: (url: string) => void,
+        id: string,
+        placeholder?: string 
+    }) => {
+        const [uploading, setUploading] = useState(false);
+        const [showUrlInput, setShowUrlInput] = useState(false);
+
+        const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await res.json();
+                if (result.success) {
+                    onUpload(result.url);
+                } else {
+                    alert(result.message || 'Upload failed');
+                }
+            } catch (err) {
+                alert('Connection error during upload');
+            } finally {
+                setUploading(false);
+            }
+        };
+
+        return (
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{label}</span>
+                    <button 
+                        type="button" 
+                        onClick={() => setShowUrlInput(!showUrlInput)}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                        {showUrlInput ? <><Upload size={12} /> Use Upload</> : <><LinkIcon size={12} /> Enter Link Manually</>}
+                    </button>
+                </label>
+                
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {showUrlInput ? (
+                        <input 
+                            type="text" 
+                            value={value || ''} 
+                            onChange={(e) => onUpload(e.target.value)} 
+                            placeholder={placeholder}
+                            style={{ flex: 1 }}
+                        />
+                    ) : (
+                        <div style={{ flex: 1, position: 'relative' }}>
+                            <input 
+                                type="file" 
+                                onChange={handleFileChange} 
+                                style={{ display: 'none' }} 
+                                id={`file-upload-${id}`}
+                                accept=".jpg,.jpeg,.png,.pdf"
+                            />
+                            <label 
+                                htmlFor={`file-upload-${id}`}
+                                className="btn"
+                                style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    gap: '8px', 
+                                    width: '100%', 
+                                    background: value ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.05)',
+                                    border: value ? '1px solid rgba(16, 185, 129, 0.2)' : '1px dashed var(--border-color)',
+                                    padding: '10px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    transition: 'var(--transition)'
+                                }}
+                            >
+                                {uploading ? (
+                                    <>Uploading...</>
+                                ) : value ? (
+                                    <><CheckCircle size={16} color="#10b981" /> {value.split('/').pop()?.substring(0, 25) || 'File selected'}</>
+                                ) : (
+                                    <><Upload size={16} /> Browse File (PDF/Image)</>
+                                )}
+                            </label>
+                        </div>
+                    )}
+                    {value && (
+                        <button 
+                            type="button" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onUpload('');
+                            }}
+                            className="btn btn-icon" 
+                            style={{ 
+                                padding: '10px', 
+                                color: '#ef4444', 
+                                background: 'rgba(239, 68, 68, 0.05)',
+                                border: '1px solid rgba(239, 68, 68, 0.1)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                            title="Clear file"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    )}
+                </div>
+                {value && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Current: {value}</p>}
+            </div>
+        );
+    };
+
     const navItems = [
         { id: 'overview', icon: '⚡', label: 'Dashboard' },
         { id: 'profile', icon: '👤', label: editData.sections?.about?.adminLabel || 'About' },
@@ -242,6 +398,8 @@ const AdminDashboard = () => {
         { id: 'papers', icon: '📚', label: editData.sections?.papers?.adminLabel || 'Publications' },
         { id: 'references', icon: '🤝', label: editData.sections?.references?.adminLabel || 'References' },
         { id: 'blogs', icon: '✍️', label: editData.sections?.blogs?.adminLabel || 'Blog Posts' },
+        { id: 'messages', icon: '📩', label: 'Messages' },
+        { id: 'visitors', icon: <Users size={18} />, label: 'Visitor Logs' },
         { id: 'contact', icon: '📞', label: editData.sections?.contact?.adminLabel || 'Contact' },
     ];
 
@@ -503,10 +661,27 @@ const AdminDashboard = () => {
                                             <input type="text" value={item.major} onChange={e => updateListItem('education', i, 'major', e.target.value)} />
                                         </div>
                                     </div>
-
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Certificate (Image/PDF)" 
+                                                value={item.certificateUrl || ''} 
+                                                id={`edu-cert-${i}`}
+                                                onUpload={(url) => updateListItem('education', i, 'certificateUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Additional Document" 
+                                                value={item.attachmentUrl || ''} 
+                                                id={`edu-attach-${i}`}
+                                                onUpload={(url) => updateListItem('education', i, 'attachmentUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '', certificateUrl: '', attachmentUrl: '' })}>
                                 <Plus size={16} /> Add Education
                             </button>
                         </div>
@@ -559,9 +734,27 @@ const AdminDashboard = () => {
                                         ))}
                                         <button className="add-inline-btn" onClick={() => addWorkDetail(i)}><Plus size={14} /> Add Detail</button>
                                     </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Appointment Letter" 
+                                                value={job.appointmentLetterUrl || ''} 
+                                                id={`work-appoint-${i}`}
+                                                onUpload={(url) => updateListItem('work', i, 'appointmentLetterUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Experience Letter" 
+                                                value={job.experienceLetterUrl || ''} 
+                                                id={`work-exp-${i}`}
+                                                onUpload={(url) => updateListItem('work', i, 'experienceLetterUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''] })}>
+                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''], appointmentLetterUrl: '', experienceLetterUrl: '' })}>
                                 <Plus size={16} /> Add Position
                             </button>
                         </div>
@@ -599,12 +792,82 @@ const AdminDashboard = () => {
                                             <input type="text" value={item.desc} onChange={e => updateListItem('experience', i, 'desc', e.target.value)} />
                                         </div>
                                     </div>
-
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Achievement Certificate" 
+                                                value={item.certificateUrl || ''} 
+                                                id={`exp-cert-${i}`}
+                                                onUpload={(url) => updateListItem('experience', i, 'certificateUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Proof Document" 
+                                                value={item.attachmentUrl || ''} 
+                                                id={`exp-attach-${i}`}
+                                                onUpload={(url) => updateListItem('experience', i, 'attachmentUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '', certificateUrl: '', attachmentUrl: '' })}>
                                 <Plus size={16} /> Add Achievement
                             </button>
+                        </div>
+                    )}
+
+                    {/* ── VISITOR LOGS ─────────────────────────────────────── */}
+                    {activeTab === 'visitors' && (
+                        <div className="tab-pane">
+                            <div className="pane-header">
+                                <div>
+                                    <h2 className="pane-title">Unique Visitors</h2>
+                                    <p className="pane-desc">Real-time log of IPs and device types visiting your portfolio.</p>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button onClick={fetchVisitors} className="btn btn-secondary">Refresh List</button>
+                                    <button onClick={handleClearVisitors} className="btn btn-danger" style={{ background: '#ef4444', border: 'none' }}>Clear All Data</button>
+                                </div>
+                            </div>
+
+                            <div className="visitor-table-container" style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                                    <thead>
+                                        <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
+                                            <th style={{ padding: '16px' }}>Visitor IP</th>
+                                            <th style={{ padding: '16px' }}>Device / Browser</th>
+                                            <th style={{ padding: '16px' }}>Last Seen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {visitors.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={3} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                                    <Users size={32} style={{ marginBottom: '12px', opacity: 0.3 }} />
+                                                    <p>No visitor logs available.</p>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            visitors.map((v, idx) => (
+                                                <tr key={v._id || idx} style={{ borderBottom: '1px solid var(--border-color)', transition: '0.2s' }}>
+                                                    <td style={{ padding: '16px', color: 'var(--primary)', fontWeight: 700 }}>{v.ip}</td>
+                                                    <td style={{ padding: '16px', color: 'var(--text-secondary)', fontSize: '0.8rem', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.device}>
+                                                        {v.device}
+                                                    </td>
+                                                    <td style={{ padding: '16px', color: 'var(--text-muted)' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                            <Calendar size={12} />
+                                                            {new Date(v.timestamp).toLocaleString()}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
 
@@ -745,11 +1008,37 @@ const AdminDashboard = () => {
                                             <input type="text" value={paper.year} onChange={e => updateListItem('papers', i, 'year', e.target.value)} />
                                         </div>
                                     </div>
-
-                                    {/* Manual attachments if needed */}
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>DOI / Link</label>
+                                            <input type="text" value={paper.doi} onChange={e => updateListItem('papers', i, 'doi', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Keywords (semi-colon separated)</label>
+                                            <input type="text" value={paper.keywords} onChange={e => updateListItem('papers', i, 'keywords', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Paper PDF" 
+                                                value={paper.documentUrl || ''} 
+                                                id={`paper-pdf-${i}`}
+                                                onUpload={(url) => updateListItem('papers', i, 'documentUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Achievement Certificate" 
+                                                value={paper.certificateUrl || ''} 
+                                                id={`paper-cert-${i}`}
+                                                onUpload={(url) => updateListItem('papers', i, 'certificateUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '', documentUrl: '', certificateUrl: '' })}>
                                 <Plus size={16} /> Add Research Paper
                             </button>
                         </div>

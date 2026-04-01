@@ -35,6 +35,7 @@ export interface WorkItem {
     attachmentLabel?: string;
     certificateUrl?: string;
     appointmentLetterUrl?: string;
+    experienceLetterUrl?: string;
 }
 
 export interface ProjectItem {
@@ -164,7 +165,7 @@ const defaultData: PortfolioData = {
         { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 – 2018', major: 'Science' }
     ],
     experience: [
-        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.' },
+        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.', certificateUrl: '/data/work-certificate.png' },
         { role: 'IT Olympiad', company: 'CSE FEST 2024', period: '2024', desc: 'Department of Computer Science & Engineering, East West University.' },
         { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certified participant in the campus-wide coding battle.' }
     ],
@@ -174,7 +175,8 @@ const defaultData: PortfolioData = {
             company: 'eshikhon', 
             startDate: '2022-01-03', 
             endDate: '2025-12-30', 
-            details: ['Represented the organization on campus.', 'Organized tech workshops and events.', 'Promoted digital learning among students.']
+            details: ['Represented the organization on campus.', 'Organized tech workshops and events.', 'Promoted digital learning among students.'],
+            appointmentLetterUrl: '/data/eshikhon-appointment-letter.pdf'
         },
         { 
             role: 'Software Engineer', 
