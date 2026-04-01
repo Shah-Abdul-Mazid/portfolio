@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Award, FileText, ExternalLink, Link as LinkIcon } from 'lucide-react';
+import { FileText, ExternalLink, Link as LinkIcon } from 'lucide-react';
 
 const Experience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
