@@ -1,10 +1,6 @@
 import { useState } from 'react';
-import { usePortfolio } from '../context/PortfolioContext';
-<<<<<<< HEAD
-import { Link as LinkIcon, FileText } from 'lucide-react';
-=======
+import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { FileText, ExternalLink, Link as LinkIcon } from 'lucide-react';
->>>>>>> edf6201f2eceb9556137232946572e647a7a1d4c
 
 const Experience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
@@ -42,38 +38,21 @@ const Experience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void
                                 <div className="card-content">
                                     <p className="card-list-alt">{items.desc}</p>
                                     
-<<<<<<< HEAD
-                                    {(items.attachmentUrl || items.certificateUrl) && (
-                                        <div className="attachments-group">
-                                            {items.certificateUrl && (
-                                                <button onClick={() => setSelectedFile(items.certificateUrl as string)} className="attachment-link">
-                                                    <FileText size={14} style={{ marginRight: '6px' }} />
-                                                    Certificate
-                                                </button>
-                                            )}
-                                            {items.attachmentUrl && (
-                                                <a href={items.attachmentUrl} target="_blank" rel="noopener noreferrer" className="attachment-link">
-                                                    <LinkIcon size={14} style={{ marginRight: '6px' }} />
-                                                    {items.attachmentLabel || 'View Document'}
-                                                </a>
-                                            )}
-=======
                                     {items.attachmentUrl && (
                                         <div className="card-actions" style={{ marginTop: '12px' }}>
-                                            <a href={items.attachmentUrl} target="_blank" rel="noopener noreferrer" className="attachment-link">
+                                            <a href={resolveUrl(items.attachmentUrl)} target="_blank" rel="noopener noreferrer" className="attachment-link">
                                                 <LinkIcon size={12} style={{ marginRight: '6px' }} />
                                                 Original Proof
                                             </a>
->>>>>>> edf6201f2eceb9556137232946572e647a7a1d4c
                                         </div>
                                     )}
                                 </div>
 
                                 {items.certificateUrl && (
                                     <div className="card-previews">
-                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(items.certificateUrl as string)}>
+                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(resolveUrl(items.certificateUrl))}>
                                             {isImage(items.certificateUrl) ? (
-                                                <img src={items.certificateUrl} alt="Certificate" />
+                                                <img src={resolveUrl(items.certificateUrl)} alt="Certificate" />
                                             ) : (
                                                 <div className="mini-pdf-tag"><FileText size={16} /></div>
                                             )}

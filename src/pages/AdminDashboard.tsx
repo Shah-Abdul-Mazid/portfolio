@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-<<<<<<< HEAD
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle } from 'lucide-react';
-=======
 import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users } from 'lucide-react';
->>>>>>> edf6201f2eceb9556137232946572e647a7a1d4c
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 
 const AdminDashboard = () => {

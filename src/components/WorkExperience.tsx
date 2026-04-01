@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { usePortfolio } from '../context/PortfolioContext';
+import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { calculateWorkDuration, formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
 import { Award, FileText, ExternalLink } from 'lucide-react';
 
@@ -48,9 +48,9 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
 
                                 <div className="card-previews">
                                     {job.appointmentLetterUrl && (
-                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(job.appointmentLetterUrl as string)}>
+                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(resolveUrl(job.appointmentLetterUrl))}>
                                             {isImage(job.appointmentLetterUrl) ? (
-                                                <img src={job.appointmentLetterUrl} alt="Document" />
+                                                <img src={resolveUrl(job.appointmentLetterUrl)} alt="Document" />
                                             ) : (
                                                 <div className="mini-pdf-tag"><FileText size={12} /></div>
                                             )}
@@ -58,9 +58,9 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                                         </div>
                                     )}
                                     {job.experienceLetterUrl && (
-                                        <div className="mini-thumbnail blue" onClick={() => setSelectedFile(job.experienceLetterUrl as string)}>
+                                        <div className="mini-thumbnail blue" onClick={() => setSelectedFile(resolveUrl(job.experienceLetterUrl))}>
                                             {isImage(job.experienceLetterUrl) ? (
-                                                <img src={job.experienceLetterUrl} alt="Document" />
+                                                <img src={resolveUrl(job.experienceLetterUrl)} alt="Document" />
                                             ) : (
                                                 <div className="mini-pdf-tag blue"><Award size={12} /></div>
                                             )}

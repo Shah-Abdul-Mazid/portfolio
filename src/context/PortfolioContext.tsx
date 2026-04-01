@@ -272,6 +272,26 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 const API_BASE = '/api';
 
+// Helper to resolve document URLs (strips localhost if present, ensuring it works in prod)
+export const resolveUrl = (url: string | undefined): string => {
+    if (!url) return '';
+    // If it's already a full production URL or a relative path, keep it
+    if (url.startsWith('https://') || url.startsWith('http://') && !url.includes('localhost')) {
+        return url;
+    }
+    // If it's a localhost URL, convert to relative /uploads
+    if (url.includes('localhost:3001/uploads/')) {
+        return url.split('localhost:3001')[1];
+    }
+    // For relative paths like /uploads/..., prefix with backend URL in development
+    // In production (Vercel), since it's proxied/served from same origin, /uploads/... works
+    const isDev = window.location.hostname === 'localhost';
+    if (url.startsWith('/uploads/') && isDev) {
+        return `http://localhost:3001${url}`;
+    }
+    return url;
+};
+
 const sanitizeData = (obj: any): any => {
     if (typeof obj !== 'object' || obj === null) {
         if (typeof obj === 'string' && obj.startsWith('/data/')) {

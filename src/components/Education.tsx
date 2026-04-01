@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
-import { usePortfolio } from '../context/PortfolioContext';
-<<<<<<< HEAD
-import { Link as LinkIcon, FileText } from 'lucide-react';
-=======
+import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { FileText, ExternalLink, Link as LinkIcon } from 'lucide-react';
->>>>>>> edf6201f2eceb9556137232946572e647a7a1d4c
 
 const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
@@ -35,31 +31,6 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                 </div>
                 <div className="card-stack">
                     {education.map((item, index) => (
-<<<<<<< HEAD
-                        <div key={index} className="timeline-item fade-in" ref={addToRefs}>
-                            <div className="timeline-dot"></div>
-                            <div className="timeline-content">
-                                <div className="edu-main-info">
-                                    <h3>{item.degree}</h3>
-                                    <p className="school">{item.school}</p>
-                                    <p className="major">{item.major}</p>
-                                    <p className="year">{item.year}</p>
-                                    
-                                    {(item.attachmentUrl || item.certificateUrl) && (
-                                        <div className="attachments-group">
-                                            {item.certificateUrl && (
-                                                <button onClick={() => setSelectedFile(item.certificateUrl as string)} className="attachment-link">
-                                                    <FileText size={14} style={{ marginRight: '6px' }} />
-                                                    Certificate
-                                                </button>
-                                            )}
-                                            {item.attachmentUrl && (
-                                                <a href={item.attachmentUrl} target="_blank" rel="noopener noreferrer" className="attachment-link">
-                                                    <LinkIcon size={14} style={{ marginRight: '6px' }} />
-                                                    {item.attachmentLabel || 'View Document'}
-                                                </a>
-                                            )}
-=======
                         <div key={index} className="unified-card fade-in" ref={addToRefs}>
                             <div className="card-header">
                                 <div className="card-title-group">
@@ -75,20 +46,19 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                                 <div className="card-content">
                                     {item.attachmentUrl && (
                                         <div className="card-actions" style={{ marginTop: '12px' }}>
-                                            <a href={item.attachmentUrl} target="_blank" rel="noopener noreferrer" className="attachment-link">
+                                            <a href={resolveUrl(item.attachmentUrl)} target="_blank" rel="noopener noreferrer" className="attachment-link">
                                                 <LinkIcon size={12} style={{ marginRight: '6px' }} />
                                                 Academic Transcript
                                             </a>
->>>>>>> edf6201f2eceb9556137232946572e647a7a1d4c
                                         </div>
                                     )}
                                 </div>
                                 
                                 {item.certificateUrl && (
                                     <div className="card-previews">
-                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(item.certificateUrl as string)}>
+                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(resolveUrl(item.certificateUrl))}>
                                             {isImage(item.certificateUrl) ? (
-                                                <img src={item.certificateUrl} alt="Certificate" />
+                                                <img src={resolveUrl(item.certificateUrl)} alt="Certificate" />
                                             ) : (
                                                 <div className="mini-pdf-tag"><FileText size={16} /></div>
                                             )}
