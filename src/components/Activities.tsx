@@ -7,7 +7,7 @@ const Activities = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void
     if (activities.length === 0) return null;
 
     return (
-        <section id="activities" className="section bg-light">
+        <section id="activities" className="section alt-bg">
             <div className="container">
                 <div className="section-title fade-in" ref={addToRefs}>
                     <span className="subtitle">{data.sections?.activities?.subtitle || 'Involvement'}</span>
@@ -19,30 +19,48 @@ const Activities = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void
                         )}
                     </h2>
                 </div>
-                <div className="activities-grid">
+                <div className="card-stack">
                     {activities.map((item, index) => (
-                        <div key={index} className="activity-card fade-in" ref={addToRefs}>
-                            <div className="activity-header">
-                                <h3>{item.role}</h3>
-                                <span className="period">{item.period}</span>
+                        <div key={index} className="unified-card fade-in" ref={addToRefs}>
+                            <div className="card-header">
+                                <div className="card-title-group">
+                                    <h3 className="card-title">{item.role}</h3>
+                                    <p className="card-subtitle">{item.organization}</p>
+                                </div>
+                                <div className="card-meta">
+                                    <span className="card-period">{item.period}</span>
+                                </div>
                             </div>
-                            <p className="organization">{item.organization}</p>
-                            <p className="desc">{item.desc}</p>
+                            <div className="card-body">
+                                <div className="card-content">
+                                    <p className="card-list-alt">{item.desc}</p>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
             </div>
             <style>{`
-                .activities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 40px; }
-                .activity-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; transition: var(--transition); display: flex; flex-direction: column; position: relative; overflow: hidden; }
-                .activity-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(to bottom, var(--primary), var(--secondary)); opacity: 0; transition: var(--transition); }
-                .activity-card:hover { transform: translateY(-5px); border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
-                .activity-card:hover::before { opacity: 1; }
-                .activity-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 16px; }
-                .activity-header h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin: 0; }
-                .period { background: rgba(139, 92, 246, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
-                .organization { font-size: 1rem; color: var(--primary); font-weight: 600; margin-bottom: 16px; }
-                .desc { color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin: 0; flex: 1; }
+                .card-stack { max-width: 850px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+                .unified-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; transition: var(--transition); position: relative; }
+                .unified-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+                
+                .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 20px; }
+                .card-title { font-size: 1.2rem; color: #fff; margin: 0 0 4px 0; font-weight: 700; }
+                .card-subtitle { color: var(--primary); font-weight: 700; font-size: 0.95rem; margin: 0; }
+                
+                .card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+                .card-period { background: rgba(139,92,246,0.08); color: var(--primary); padding: 2px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(139,92,246,0.2); }
+
+                .card-body { display: flex; gap: 24px; align-items: center; justify-content: space-between; }
+                .card-content { flex: 1; min-width: 250px; }
+                .card-list-alt { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; margin: 0; }
+
+                @media (max-width: 768px) {
+                    .unified-card { padding: 16px; }
+                    .card-header { flex-direction: column; gap: 8px; }
+                    .card-meta { align-items: flex-start; }
+                }
             `}</style>
         </section>
     );
