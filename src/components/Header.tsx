@@ -10,10 +10,13 @@ const Header = () => {
         { to: '/about', label: data.sections?.about?.navLabel || 'About' },
         { to: '/education', label: data.sections?.education?.navLabel || 'Education' },
         { to: '/work', label: data.sections?.work?.navLabel || 'Experience' },
-        { to: '/achievements', label: data.sections?.experience?.navLabel || 'Achievements' },
+        { to: '/achievements', label: data.sections?.experience?.navLabel || 'Awards' },
+        { to: '/activities', label: data.sections?.activities?.navLabel || 'Activities' },
         { to: '/skills', label: data.sections?.skills?.navLabel || 'Skills' },
         { to: '/projects', label: data.sections?.projects?.navLabel || 'Projects' },
         { to: '/papers', label: data.sections?.papers?.navLabel || 'Research' },
+        { to: '/blogs', label: data.sections?.blogs?.navLabel || 'Blog' },
+        { to: '/references', label: data.sections?.references?.navLabel || 'References' },
         { to: '/contact', label: data.sections?.contact?.navLabel || 'Contact' },
     ];
 
@@ -73,7 +76,7 @@ const Header = () => {
                 backdropFilter: scrolled ? 'blur(12px)' : 'none',
                 borderBottom: scrolled ? '1px solid var(--border-color)' : 'none'
             }}>
-                <nav className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <nav className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '30px' }}>
                     {/* Logo */}
                     <Link to="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
                         <div style={{ position: 'relative' }}>
@@ -185,19 +188,23 @@ const Header = () => {
                 .nav-links-desktop {
                     list-style: none;
                     display: flex;
-                    gap: 4px;
+                    gap: 16px;
                     align-items: center;
+                    margin: 0;
+                    padding: 0;
+                    margin-left: 40px;
                 }
                 .nav-link {
                     text-decoration: none;
                     color: var(--text-color);
-                    font-size: 0.9rem;
+                    font-size: 0.85rem;
                     font-weight: 500;
                     opacity: 0.65;
-                    padding: 6px 12px;
+                    padding: 6px 10px;
                     border-radius: 8px;
                     transition: var(--transition);
                     white-space: nowrap;
+                    letter-spacing: 0.02em;
                 }
                 .nav-link:hover { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.06); }
                 .nav-link.active { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.1); font-weight: 700; }
@@ -296,12 +303,7 @@ const Header = () => {
                 .mobile-nav-link:hover { opacity: 1; background: rgba(139,92,246,0.08); color: var(--primary); }
                 .mobile-nav-link.active { opacity: 1; background: rgba(139,92,246,0.12); color: var(--primary); font-weight: 700; }
 
-                @media (max-width: 1100px) {
-                    .nav-links-desktop { gap: 0; }
-                    .nav-link { font-size: 0.85rem; padding: 6px 9px; }
-                }
-
-                @media (max-width: 992px) {
+                @media (max-width: 1400px) {
                     .nav-links-desktop { display: none; }
                     .mobile-toggle { display: flex; }
                     .mobile-backdrop { display: block; }

@@ -1,11 +1,19 @@
 import { useState } from 'react';
+import type { MouseEvent } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, FileText, Image as ImageIcon } from 'lucide-react';
 
 const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
     const papers = data.papers || [];
     const [showAll, setShowAll] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<string | null>(null);
+
+    const closeModal = (e: MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            setSelectedFile(null);
+        }
+    };
 
     if (papers.length === 0) return null;
 
@@ -43,13 +51,27 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                                     </div>
                                 )}
                             </div>
-                            {paper.doi && (
-                                <a href={paper.doi.startsWith('http') ? paper.doi : `https://doi.org/${paper.doi}`} 
-                                   target="_blank" rel="noreferrer" className="paper-doi-btn">
-                                    <span>Read Paper</span>
-                                    <ExternalLink size={14} />
-                                </a>
-                            )}
+                            <div className="paper-actions">
+                                {paper.doi && (
+                                    <a href={paper.doi.startsWith('http') ? paper.doi : `https://doi.org/${paper.doi}`} 
+                                       target="_blank" rel="noreferrer" className="attachment-link">
+                                        <ExternalLink size={14} style={{ marginRight: '6px' }} />
+                                        Read Paper
+                                    </a>
+                                )}
+                                {paper.documentUrl && (
+                                    <button onClick={() => setSelectedFile(paper.documentUrl as string)} className="attachment-link">
+                                        <FileText size={14} style={{ marginRight: '6px' }} />
+                                        Preview PDF
+                                    </button>
+                                )}
+                                {paper.certificateUrl && (
+                                    <button onClick={() => setSelectedFile(paper.certificateUrl as string)} className="attachment-link">
+                                        <ImageIcon size={14} style={{ marginRight: '6px' }} />
+                                        Certificate
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -66,6 +88,20 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     </div>
                 )}
             </div>
+
+            {selectedFile && (
+                <div className="image-modal-overlay" onClick={closeModal}>
+                    <div className="image-modal-content">
+                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>✖</button>
+                        {selectedFile.toLowerCase().endsWith('.pdf') ? (
+                            <iframe src={selectedFile} className="pdf-viewer" title="Document Viewer" />
+                        ) : (
+                            <img src={selectedFile} alt="Fullscreen View" className="fullscreen-image" />
+                        )}
+                    </div>
+                </div>
+            )}
+
             <style>{`
                 .papers-grid { 
                     display: grid; 
@@ -100,13 +136,11 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     color: var(--text-secondary);
                     flex-wrap: wrap;
                 }
-                .paper-meta .year {
-                    background: rgba(59,130,246,0.1);
-                    color: var(--primary);
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    font-weight: 700;
-                }
+                .paper-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.05); }
+                .attachment-link { display: inline-flex; align-items: center; background: rgba(139, 92, 246, 0.08); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(139, 92, 246, 0.15); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+                .attachment-link:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
+                .attachment-link svg { transition: transform 0.3s ease; }
+                .attachment-link:hover svg { transform: scale(1.1); }
                 .paper-meta .venue {
                     font-style: italic;
                     white-space: nowrap;
@@ -143,8 +177,13 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     border-radius: 100px;
                     color: var(--text-muted);
                 }
-                .paper-doi-btn {
-                    margin: 0 16px 16px;
+                .paper-actions {
+                    padding: 0 16px 16px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .paper-action-btn {
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -157,11 +196,28 @@ const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     font-weight: 600;
                     text-decoration: none;
                     transition: all 0.2s ease;
+                    border: none;
+                    cursor: pointer;
+                    width: 100%;
                 }
-                .paper-doi-btn:hover {
+                .paper-action-btn:hover {
                     background: var(--primary-dark);
                     transform: scale(1.02);
                 }
+                .pdf-btn { background: rgba(139, 92, 246, 0.1); color: var(--primary); border: 1px solid rgba(139, 92, 246, 0.3); }
+                .pdf-btn:hover { background: var(--primary); color: white; }
+                .img-btn { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+                .img-btn:hover { background: #10b981; color: white; }
+
+                /* Fullscreen Image/PDF Modal */
+                .image-modal-overlay { position: fixed; inset: 0; background: rgba(3,7,18,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 40px; animation: modalFadeIn 0.3s ease-out; }
+                .image-modal-content { position: relative; max-width: 1200px; width: 100%; max-height: 90vh; background: #0f172a; border-radius: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+                .close-modal-btn { position: absolute; top: -16px; right: -16px; width: 32px; height: 32px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000; box-shadow: 0 4px 12px rgba(239,68,68,0.4); transition: transform 0.2s; }
+                .close-modal-btn:hover { transform: scale(1.1); }
+                .fullscreen-image { width: 100%; height: 100%; max-height: calc(90vh - 24px); object-fit: contain; border-radius: 8px; }
+                .pdf-viewer { width: 100%; height: calc(90vh - 24px); border: none; border-radius: 8px; background: white; }
+                @keyframes modalFadeIn { from { opacity: 0; backdrop-filter: blur(0); } to { opacity: 1; backdrop-filter: blur(8px); } }
+                
                 
                 @media (max-width: 1200px) {
                     .papers-grid { grid-template-columns: repeat(3, 1fr); }
