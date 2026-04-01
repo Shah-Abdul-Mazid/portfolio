@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Award, Link as LinkIcon, FileText } from 'lucide-react';
+import { Link as LinkIcon, FileText } from 'lucide-react';
 
 const Experience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
@@ -36,7 +36,7 @@ const Experience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void
                                         <div className="attachments-group">
                                             {items.certificateUrl && (
                                                 <button onClick={() => setSelectedFile(items.certificateUrl as string)} className="attachment-link">
-                                                    <Award size={14} style={{ marginRight: '6px' }} />
+                                                    <FileText size={14} style={{ marginRight: '6px' }} />
                                                     Certificate
                                                 </button>
                                             )}

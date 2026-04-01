@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Award, Link as LinkIcon, FileText } from 'lucide-react';
+import { Link as LinkIcon, FileText } from 'lucide-react';
 
 const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
@@ -42,7 +42,7 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                                         <div className="attachments-group">
                                             {item.certificateUrl && (
                                                 <button onClick={() => setSelectedFile(item.certificateUrl as string)} className="attachment-link">
-                                                    <Award size={14} style={{ marginRight: '6px' }} />
+                                                    <FileText size={14} style={{ marginRight: '6px' }} />
                                                     Certificate
                                                 </button>
                                             )}
