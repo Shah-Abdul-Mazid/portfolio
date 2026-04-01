@@ -106,14 +106,24 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 .card-list li { position: relative; padding-left: 18px; margin-bottom: 8px; color: var(--text-secondary); line-height: 1.6; font-size: 0.88rem; }
                 .card-list li::before { content: '•'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
 
-                .card-previews { display: flex; gap: 10px; flex-shrink: 0; }
-                .mini-thumbnail { position: relative; width: 60px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); background: #000; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+                .card-previews { display: flex; gap: 24px; flex-shrink: 0; padding: 4px; }
+                .mini-thumbnail { 
+                    position: relative; 
+                    width: 72px; height: 96px; 
+                    border-radius: 12px; 
+                    overflow: hidden; 
+                    border: 1px solid var(--border-color); 
+                    background: rgba(0,0,0,0.3); 
+                    cursor: pointer; 
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.3); 
+                }
                 .mini-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-                .mini-pdf-tag { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; }
+                .mini-pdf-tag { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; font-weight: 700; font-size: 0.7rem; }
                 .mini-pdf-tag.blue { background: #3b82f6; }
-                .thumbnail-overlay { position: absolute; inset: 0; background: rgba(139,92,246,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; color: white; }
-                .mini-thumbnail:hover { border-color: var(--primary); scale: 1.05; }
-                .mini-thumbnail:hover .thumbnail-overlay { opacity: 1; }
+                .thumbnail-overlay { position: absolute; inset: 0; background: var(--gradient); opacity: 0; display: flex; align-items: center; justify-content: center; transition: 0.3s; color: white; }
+                .mini-thumbnail:hover { border-color: var(--primary); scale: 1.1; transform: translateY(-4px); box-shadow: 0 12px 24px rgba(139,92,246,0.3); }
+                .mini-thumbnail:hover .thumbnail-overlay { opacity: 0.9; }
 
                 .image-modal-overlay { position: fixed; inset: 0; background: rgba(3,7,18,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 40px; }
                 .image-modal-content { position: relative; max-width: 900px; width: 100%; max-height: 85vh; background: #0f172a; border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); }

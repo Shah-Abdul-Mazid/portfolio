@@ -2,23 +2,28 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import avtarImg from '../assets/avtar.png';
 
-import { usePortfolio } from '../context/PortfolioContext';
-
 const Header = () => {
-    const { data } = usePortfolio();
-    const navLinks = [
-        { to: '/about', label: data.sections?.about?.navLabel || 'About' },
-        { to: '/education', label: data.sections?.education?.navLabel || 'Education' },
-        { to: '/work', label: data.sections?.work?.navLabel || 'Experience' },
-        { to: '/achievements', label: data.sections?.experience?.navLabel || 'Awards' },
-        { to: '/activities', label: data.sections?.activities?.navLabel || 'Activities' },
-        { to: '/skills', label: data.sections?.skills?.navLabel || 'Skills' },
-        { to: '/projects', label: data.sections?.projects?.navLabel || 'Projects' },
-        { to: '/papers', label: data.sections?.papers?.navLabel || 'Research' },
-        { to: '/blogs', label: data.sections?.blogs?.navLabel || 'Blog' },
-        { to: '/references', label: data.sections?.references?.navLabel || 'References' },
-        { to: '/contact', label: data.sections?.contact?.navLabel || 'Contact' },
+    const professionalLinks = [
+        { to: '/about', label: 'Profile' },
+        { to: '/education', label: 'Education' },
+        { to: '/work', label: 'Experience' },
+        { to: '/achievements', label: 'Achievements' },
+        { to: '/activities', label: 'Activities' },
     ];
+
+    const portfolioLinks = [
+        { to: '/skills', label: 'Tech Stack' },
+        { to: '/projects', label: 'Projects' },
+        { to: '/papers', label: 'Research' },
+        { to: '/blogs', label: 'Blog' },
+    ];
+
+    const contactLinks = [
+        { to: '/references', label: 'References' },
+        { to: '/contact', label: 'Contact' },
+    ];
+
+    const allLinks = [...professionalLinks, ...portfolioLinks, ...contactLinks];
 
     const [scrolled, setScrolled] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -93,19 +98,40 @@ const Header = () => {
                         <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-color)', whiteSpace: 'nowrap' }}>Shah Abdul Mazid</span>
                     </Link>
 
-                    {/* Desktop Nav */}
-                    <ul className="nav-links-desktop">
-                        {navLinks.map((link) => (
-                            <li key={link.to}>
-                                <Link
-                                    to={link.to}
-                                    className={location.pathname === link.to ? 'nav-link active' : 'nav-link'}
-                                >
-                                    {link.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                    {/* Desktop Nav - Grouped */}
+                    <div className="nav-links-desktop">
+                        <div className="nav-group">
+                            <span className="group-label">Professional</span>
+                            <div className="dropdown-menu">
+                                {professionalLinks.map(link => (
+                                    <Link key={link.to} to={link.to} className={location.pathname === link.to ? 'dropdown-link active' : 'dropdown-link'}>
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="nav-group">
+                            <span className="group-label">Portfolio</span>
+                            <div className="dropdown-menu">
+                                {portfolioLinks.map(link => (
+                                    <Link key={link.to} to={link.to} className={location.pathname === link.to ? 'dropdown-link active' : 'dropdown-link'}>
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="nav-group">
+                            <span className="group-label">Reach Out</span>
+                            <div className="dropdown-menu">
+                                {contactLinks.map(link => (                                    <Link key={link.to} to={link.to} className={location.pathname === link.to ? 'dropdown-link active' : 'dropdown-link'}>
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Right Controls */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -155,7 +181,7 @@ const Header = () => {
 
                 <nav className="mobile-nav">
                     <ul>
-                        {navLinks.map((link) => (
+                        {allLinks.map((link) => (
                             <li key={link.to}>
                                 <Link
                                     to={link.to}
@@ -184,30 +210,75 @@ const Header = () => {
                 }
                 #theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
 
-                /* Desktop nav */
+                /* Grouped Desktop nav */
                 .nav-links-desktop {
-                    list-style: none;
                     display: flex;
-                    gap: 16px;
+                    gap: 32px;
                     align-items: center;
-                    margin: 0;
-                    padding: 0;
-                    margin-left: 40px;
+                    margin: 0 auto;
                 }
-                .nav-link {
+                .nav-group {
+                    position: relative;
+                    padding: 10px 0;
+                }
+                .group-label {
+                    color: var(--text-color);
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    opacity: 0.7;
+                    transition: var(--transition);
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+                .group-label::after {
+                    content: '▾';
+                    font-size: 0.7rem;
+                    transition: transform 0.3s;
+                }
+                .nav-group:hover .group-label { opacity: 1; color: var(--primary); }
+                .nav-group:hover .group-label::after { transform: rotate(180deg); }
+
+                .dropdown-menu {
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%) translateY(10px);
+                    background: var(--nav-bg);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--border-color);
+                    border-radius: 14px;
+                    padding: 8px;
+                    min-width: 160px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+                    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+                    pointer-events: none;
+                }
+                .nav-group:hover .dropdown-menu {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateX(-50%) translateY(0);
+                    pointer-events: auto;
+                }
+
+                .dropdown-link {
                     text-decoration: none;
                     color: var(--text-color);
                     font-size: 0.85rem;
-                    font-weight: 500;
-                    opacity: 0.65;
-                    padding: 6px 10px;
-                    border-radius: 8px;
+                    padding: 10px 16px;
+                    border-radius: 10px;
                     transition: var(--transition);
+                    opacity: 0.7;
                     white-space: nowrap;
-                    letter-spacing: 0.02em;
                 }
-                .nav-link:hover { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.06); }
-                .nav-link.active { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.1); font-weight: 700; }
+                .dropdown-link:hover { opacity: 1; background: rgba(139,92,246,0.1); color: var(--primary); }
+                .dropdown-link.active { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.15); font-weight: 700; }
 
                 /* Hamburger */
                 .mobile-toggle {

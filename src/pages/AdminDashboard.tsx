@@ -94,12 +94,23 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleDeleteMessage = async (id: string) => {
-        if (!window.confirm('Delete this message?')) return;
+    const handleDeleteMessage = async (id: string, skipConfirm = false) => {
+        if (!skipConfirm && !window.confirm('Delete this message?')) return;
         try {
             await fetch(`/api/messages/${id}`, { method: 'DELETE' });
             fetchRealTimeData();
         } catch { alert('Failed to delete message'); }
+    };
+
+    const handleReplyAndDelete = async (id: string, email: string) => {
+        // Open the email client
+        window.location.href = `mailto:${email}?subject=RE: Portfolio Inquiry`;
+        // Delay a bit to ensure the mailto: is triggered before the confirm/delete
+        setTimeout(async () => {
+             if (window.confirm('The reply mail has been opened. Would you like to clear this message from the database now?')) {
+                 handleDeleteMessage(id, true);
+             }
+        }, 500);
     };
 
     const fetchVisitors = async () => {
@@ -569,7 +580,8 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="message-body"><p>{msg.query}</p></div>
                                         <div className="message-actions">
-                                            <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-primary"><Reply size={14} /> Reply</a>
+                                            <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-secondary"><Reply size={14} /> Only Reply</a>
+                                            <button onClick={() => handleReplyAndDelete(msg.id, msg.email)} className="btn-small btn-primary"><Mail size={14} /> Reply & Clear</button>
                                             <button onClick={() => handleDeleteMessage(msg.id)} className="btn-small btn-danger"><Trash2 size={14} /> Delete</button>
                                         </div>
                                     </div>
