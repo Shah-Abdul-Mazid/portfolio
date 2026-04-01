@@ -164,9 +164,9 @@ const defaultData: PortfolioData = {
         { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 – 2018', major: 'Science' }
     ],
     experience: [
-        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.', certificateUrl: '/data/Short-Term-Work-Certificate-Template-edit-online.png' },
-        { role: 'IT Olympiad', company: 'CSE FEST 2024', period: '2024', desc: 'Department of Computer Science & Engineering, East West University.', certificateUrl: '/data/Short-Term-Work-Certificate-Template-edit-online.png' },
-        { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certified participant in the campus-wide coding battle.', certificateUrl: '/data/Short-Term-Work-Certificate-Template-edit-online.png' }
+        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.' },
+        { role: 'IT Olympiad', company: 'CSE FEST 2024', period: '2024', desc: 'Department of Computer Science & Engineering, East West University.' },
+        { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certified participant in the campus-wide coding battle.' }
     ],
     work: [
         { 
@@ -174,16 +174,14 @@ const defaultData: PortfolioData = {
             company: 'eshikhon', 
             startDate: '2022-01-03', 
             endDate: '2025-12-30', 
-            details: ['Represented the organization on campus.', 'Organized tech workshops and events.', 'Promoted digital learning among students.'],
-            appointmentLetterUrl: '/data/eShikhon Appointment Letter.pdf'
+            details: ['Represented the organization on campus.', 'Organized tech workshops and events.', 'Promoted digital learning among students.']
         },
         { 
             role: 'Software Engineer', 
             company: 'softvence Omega', 
             startDate: '2026-02-01', 
             endDate: '', 
-            details: ['Developing innovative AI solutions.', 'Implementing premium web architectures.', 'Contributing to research projects.'],
-            appointmentLetterUrl: '/data/eShikhon Appointment Letter.pdf'
+            details: ['Developing innovative AI solutions.', 'Implementing premium web architectures.', 'Contributing to research projects.']
         }
     ],
     projects: [
@@ -272,6 +270,21 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 const API_BASE = '/api';
 
+const sanitizeData = (obj: any): any => {
+    if (typeof obj !== 'object' || obj === null) {
+        if (typeof obj === 'string' && obj.startsWith('/data/')) {
+            return obj.replace(/ /g, '-');
+        }
+        return obj;
+    }
+    if (Array.isArray(obj)) return obj.map(sanitizeData);
+    const newObj: any = {};
+    for (const key in obj) {
+        newObj[key] = sanitizeData(obj[key]);
+    }
+    return newObj;
+};
+
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [data, setData] = useState<PortfolioData>(defaultData);
 
@@ -289,8 +302,9 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                             sections: { ...defaultData.sections, ...(dbData.sections || {}) },
                             contact: { ...defaultData.contact, ...(dbData.contact || {}) } 
                         };
-                        setData(merged);
-                        localStorage.setItem('portfolio_data', JSON.stringify(merged));
+                        const sanitized = sanitizeData(merged);
+                        setData(sanitized);
+                        localStorage.setItem('portfolio_data', JSON.stringify(sanitized));
                         return;
                     }
                 }
@@ -302,12 +316,13 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    setData({ 
+                    const merged = { 
                         ...defaultData, 
                         ...parsed, 
                         sections: { ...defaultData.sections, ...(parsed.sections || {}) },
                         contact: { ...defaultData.contact, ...(parsed.contact || {}) } 
-                    });
+                    };
+                    setData(sanitizeData(merged));
                 } catch {
                     setData(defaultData);
                 }

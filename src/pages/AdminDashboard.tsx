@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, FileText, CheckCircle } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 
 const AdminDashboard = () => {
@@ -228,116 +228,7 @@ const AdminDashboard = () => {
         });
     };
 
-    const FileUploadInput = ({ label, value, onUpload, id, placeholder = "Enter URL or upload file" }: { 
-        label: string, 
-        value: string, 
-        onUpload: (url: string) => void,
-        id: string,
-        placeholder?: string 
-    }) => {
-        const [uploading, setUploading] = useState(false);
-        const [showUrlInput, setShowUrlInput] = useState(false);
 
-        const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-
-            setUploading(true);
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const res = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-                const result = await res.json();
-                if (result.success) {
-                    onUpload(result.url);
-                } else {
-                    alert(result.message || 'Upload failed');
-                }
-            } catch (err) {
-                alert('Connection error during upload');
-            } finally {
-                setUploading(false);
-            }
-        };
-
-        return (
-            <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>{label}</span>
-                    <button 
-                        type="button" 
-                        onClick={() => setShowUrlInput(!showUrlInput)}
-                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    >
-                        {showUrlInput ? <><Upload size={12} /> Use Upload</> : <><LinkIcon size={12} /> Enter Link Manually</>}
-                    </button>
-                </label>
-                
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    {showUrlInput ? (
-                        <input 
-                            type="text" 
-                            value={value || ''} 
-                            onChange={(e) => onUpload(e.target.value)} 
-                            placeholder={placeholder}
-                            style={{ flex: 1 }}
-                        />
-                    ) : (
-                        <div style={{ flex: 1, position: 'relative' }}>
-                            <input 
-                                type="file" 
-                                onChange={handleFileChange} 
-                                style={{ display: 'none' }} 
-                                id={`file-upload-${id}`}
-                                accept=".jpg,.jpeg,.png,.pdf"
-                            />
-                            <label 
-                                htmlFor={`file-upload-${id}`}
-                                className="btn"
-                                style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center', 
-                                    gap: '8px', 
-                                    width: '100%', 
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: '1px dashed var(--border-color)',
-                                    padding: '10px',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    transition: 'var(--transition)'
-                                }}
-                            >
-                                {uploading ? (
-                                    <>Uploading...</>
-                                ) : value ? (
-                                    <><CheckCircle size={16} color="#10b981" /> {value.split('/').pop()?.substring(0, 20)}...</>
-                                ) : (
-                                    <><Upload size={16} /> Browse File (PDF/Image)</>
-                                )}
-                            </label>
-                        </div>
-                    )}
-                    {value && !showUrlInput && (
-                        <button 
-                            type="button" 
-                            onClick={() => onUpload('')}
-                            className="btn btn-icon" 
-                            style={{ padding: '8px', color: '#ef4444' }}
-                            title="Clear file"
-                        >
-                            <Trash2 size={16} />
-                        </button>
-                    )}
-                </div>
-                {value && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Current: {value}</p>}
-            </div>
-        );
-    };
 
     const navItems = [
         { id: 'overview', icon: '⚡', label: 'Dashboard' },
@@ -346,7 +237,7 @@ const AdminDashboard = () => {
         { id: 'work', icon: '💼', label: editData.sections?.work?.adminLabel || 'Experience' },
         { id: 'projects', icon: '🚀', label: editData.sections?.projects?.adminLabel || 'Projects' },
         { id: 'skills', icon: '🧠', label: editData.sections?.skills?.adminLabel || 'Skills' },
-        { id: 'experience', icon: '📜', label: editData.sections?.experience?.adminLabel || 'Certificates' },
+        { id: 'experience', icon: '📜', label: editData.sections?.experience?.adminLabel || 'Achievements' },
         { id: 'activities', icon: '🏅', label: editData.sections?.activities?.adminLabel || 'Activities' },
         { id: 'papers', icon: '📚', label: editData.sections?.papers?.adminLabel || 'Publications' },
         { id: 'references', icon: '🤝', label: editData.sections?.references?.adminLabel || 'References' },
@@ -612,27 +503,10 @@ const AdminDashboard = () => {
                                             <input type="text" value={item.major} onChange={e => updateListItem('education', i, 'major', e.target.value)} />
                                         </div>
                                     </div>
-                                    <div className="flex-group">
-                                        <FileUploadInput 
-                                            label="Document (PDF)"
-                                            id={`edu-doc-${i}`}
-                                            value={item.attachmentUrl || ''}
-                                            onUpload={(url) => updateListItem('education', i, 'attachmentUrl', url)}
-                                        />
-                                        <FileUploadInput 
-                                            label="Certificate Image"
-                                            id={`edu-cert-${i}`}
-                                            value={item.certificateUrl || ''}
-                                            onUpload={(url) => updateListItem('education', i, 'certificateUrl', url)}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Attachment Button Label</label>
-                                        <input type="text" value={item.attachmentLabel || ''} placeholder="e.g. View Certificate" onChange={e => updateListItem('education', i, 'attachmentLabel', e.target.value)} />
-                                    </div>
+
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '', attachmentUrl: '', attachmentLabel: '', certificateUrl: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '' })}>
                                 <Plus size={16} /> Add Education
                             </button>
                         </div>
@@ -672,30 +546,7 @@ const AdminDashboard = () => {
                                                 onChange={e => updateListItem('work', i, 'endDate', e.target.value)} />
                                         </div>
                                     </div>
-                                    <div className="flex-group">
-                                        <FileUploadInput 
-                                            label="Appointment Letter (PDF)"
-                                            id={`work-letter-${i}`}
-                                            value={job.appointmentLetterUrl || ''}
-                                            onUpload={(url) => updateListItem('work', i, 'appointmentLetterUrl', url)}
-                                        />
-                                        <FileUploadInput 
-                                            label="Experience Certificate"
-                                            id={`work-cert-${i}`}
-                                            value={job.certificateUrl || ''}
-                                            onUpload={(url) => updateListItem('work', i, 'certificateUrl', url)}
-                                        />
-                                    </div>
-                                    <div className="flex-group">
-                                        <div className="form-group w-50">
-                                            <label>Generic Attachment URL</label>
-                                            <input type="text" value={job.attachmentUrl || ''} placeholder="e.g. Any other document link" onChange={e => updateListItem('work', i, 'attachmentUrl', e.target.value)} />
-                                        </div>
-                                        <div className="form-group w-50">
-                                            <label>Generic Attachment Label</label>
-                                            <input type="text" value={job.attachmentLabel || ''} placeholder="e.g. View Document" onChange={e => updateListItem('work', i, 'attachmentLabel', e.target.value)} />
-                                        </div>
-                                    </div>
+
                                     <div className="form-group">
                                         <label>Responsibilities / Details</label>
                                         {job.details.map((detail, di) => (
@@ -710,7 +561,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''], attachmentUrl: '', attachmentLabel: '', appointmentLetterUrl: '', certificateUrl: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''] })}>
                                 <Plus size={16} /> Add Position
                             </button>
                         </div>
@@ -748,29 +599,10 @@ const AdminDashboard = () => {
                                             <input type="text" value={item.desc} onChange={e => updateListItem('experience', i, 'desc', e.target.value)} />
                                         </div>
                                     </div>
-                                    <div className="flex-group">
-                                        <FileUploadInput 
-                                            label="Certificate Image"
-                                            id={`exp-cert-${i}`}
-                                            value={item.certificateUrl || ''}
-                                            onUpload={(url) => updateListItem('experience', i, 'certificateUrl', url)}
-                                        />
-                                        <FileUploadInput 
-                                            label="Other Attachment (PDF/Doc)"
-                                            id={`exp-doc-${i}`}
-                                            value={item.attachmentUrl || ''}
-                                            onUpload={(url) => updateListItem('experience', i, 'attachmentUrl', url)}
-                                        />
-                                    </div>
-                                    <div className="flex-group">
-                                        <div className="form-group w-50">
-                                            <label>Generic Attachment Label</label>
-                                            <input type="text" value={item.attachmentLabel || ''} placeholder="e.g. View Document" onChange={e => updateListItem('experience', i, 'attachmentLabel', e.target.value)} />
-                                        </div>
-                                    </div>
+
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '', attachmentUrl: '', attachmentLabel: '', certificateUrl: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '' })}>
                                 <Plus size={16} /> Add Achievement
                             </button>
                         </div>
@@ -913,24 +745,11 @@ const AdminDashboard = () => {
                                             <input type="text" value={paper.year} onChange={e => updateListItem('papers', i, 'year', e.target.value)} />
                                         </div>
                                     </div>
-                                    <div className="flex-group">
-                                        <FileUploadInput 
-                                            label="Full Paper (PDF)"
-                                            id={`paper-doc-${i}`}
-                                            value={paper.documentUrl || ''}
-                                            onUpload={(url) => updateListItem('papers', i, 'documentUrl', url)}
-                                        />
-                                        <FileUploadInput 
-                                            label="Presentation/Certificate"
-                                            id={`paper-cert-${i}`}
-                                            value={paper.certificateUrl || ''}
-                                            onUpload={(url) => updateListItem('papers', i, 'certificateUrl', url)}
-                                        />
-                                    </div>
+
                                     {/* Manual attachments if needed */}
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '', documentUrl: '', certificateUrl: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '' })}>
                                 <Plus size={16} /> Add Research Paper
                             </button>
                         </div>
