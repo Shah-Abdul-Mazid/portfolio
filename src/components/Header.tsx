@@ -98,39 +98,17 @@ const Header = () => {
                         <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-color)', whiteSpace: 'nowrap' }}>Shah Abdul Mazid</span>
                     </Link>
 
-                    {/* Desktop Nav - Grouped */}
+                    {/* Desktop Nav - Flat side by side */}
                     <div className="nav-links-desktop">
-                        <div className="nav-group">
-                            <span className="group-label">Professional</span>
-                            <div className="dropdown-menu">
-                                {professionalLinks.map(link => (
-                                    <Link key={link.to} to={link.to} className={location.pathname === link.to ? 'dropdown-link active' : 'dropdown-link'}>
-                                        {link.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="nav-group">
-                            <span className="group-label">Portfolio</span>
-                            <div className="dropdown-menu">
-                                {portfolioLinks.map(link => (
-                                    <Link key={link.to} to={link.to} className={location.pathname === link.to ? 'dropdown-link active' : 'dropdown-link'}>
-                                        {link.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="nav-group">
-                            <span className="group-label">Reach Out</span>
-                            <div className="dropdown-menu">
-                                {contactLinks.map(link => (                                    <Link key={link.to} to={link.to} className={location.pathname === link.to ? 'dropdown-link active' : 'dropdown-link'}>
-                                        {link.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
+                        {allLinks.map(link => (
+                            <Link
+                                key={link.to}
+                                to={link.to}
+                                className={location.pathname === link.to ? 'nav-flat-link active' : 'nav-flat-link'}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
                     </div>
 
                     {/* Right Controls */}
@@ -210,75 +188,42 @@ const Header = () => {
                 }
                 #theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
 
-                /* Grouped Desktop nav */
+                /* Flat Desktop nav */
                 .nav-links-desktop {
                     display: flex;
-                    gap: 32px;
+                    gap: 4px;
                     align-items: center;
                     margin: 0 auto;
+                    flex-wrap: nowrap;
                 }
-                .nav-group {
-                    position: relative;
-                    padding: 10px 0;
-                }
-                .group-label {
-                    color: var(--text-color);
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    transition: var(--transition);
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                }
-                .group-label::after {
-                    content: '▾';
-                    font-size: 0.7rem;
-                    transition: transform 0.3s;
-                }
-                .nav-group:hover .group-label { opacity: 1; color: var(--primary); }
-                .nav-group:hover .group-label::after { transform: rotate(180deg); }
-
-                .dropdown-menu {
-                    position: absolute;
-                    top: 100%;
-                    left: 50%;
-                    transform: translateX(-50%) translateY(10px);
-                    background: var(--nav-bg);
-                    backdrop-filter: blur(20px);
-                    border: 1px solid var(--border-color);
-                    border-radius: 14px;
-                    padding: 8px;
-                    min-width: 160px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2px;
-                    opacity: 0;
-                    visibility: hidden;
-                    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-                    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-                    pointer-events: none;
-                }
-                .nav-group:hover .dropdown-menu {
-                    opacity: 1;
-                    visibility: visible;
-                    transform: translateX(-50%) translateY(0);
-                    pointer-events: auto;
-                }
-
-                .dropdown-link {
+                .nav-flat-link {
                     text-decoration: none;
                     color: var(--text-color);
                     font-size: 0.85rem;
-                    padding: 10px 16px;
+                    font-weight: 500;
+                    padding: 8px 12px;
                     border-radius: 10px;
-                    transition: var(--transition);
                     opacity: 0.7;
                     white-space: nowrap;
+                    transition: var(--transition);
+                    position: relative;
                 }
-                .dropdown-link:hover { opacity: 1; background: rgba(139,92,246,0.1); color: var(--primary); }
-                .dropdown-link.active { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.15); font-weight: 700; }
+                .nav-flat-link::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 4px;
+                    left: 12px;
+                    right: 12px;
+                    height: 2px;
+                    background: var(--primary);
+                    border-radius: 2px;
+                    transform: scaleX(0);
+                    transition: transform 0.25s ease;
+                }
+                .nav-flat-link:hover { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.08); }
+                .nav-flat-link:hover::after { transform: scaleX(1); }
+                .nav-flat-link.active { opacity: 1; color: var(--primary); font-weight: 700; }
+                .nav-flat-link.active::after { transform: scaleX(1); }
 
                 /* Hamburger */
                 .mobile-toggle {
@@ -374,7 +319,7 @@ const Header = () => {
                 .mobile-nav-link:hover { opacity: 1; background: rgba(139,92,246,0.08); color: var(--primary); }
                 .mobile-nav-link.active { opacity: 1; background: rgba(139,92,246,0.12); color: var(--primary); font-weight: 700; }
 
-                @media (max-width: 1400px) {
+                @media (max-width: 900px) {
                     .nav-links-desktop { display: none; }
                     .mobile-toggle { display: flex; }
                     .mobile-backdrop { display: block; }
