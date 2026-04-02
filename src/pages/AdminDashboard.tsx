@@ -73,6 +73,10 @@ const AdminDashboard = () => {
             const msgsRes = await fetch('/api/messages');
             const msgsData = await msgsRes.json();
 
+            // MOCK TEST DATA for verification
+            const mockMessage = { id: 'test-123', name: 'Test User', email: 'ezanshah58@gmail.com', query: 'Verification test for Reply & Clear', created_at: new Date().toISOString() };
+            const combinedMessages = Array.isArray(msgsData) ? [mockMessage, ...msgsData] : [mockMessage];
+
             let adminsData = [];
             if (token) {
                 const adminsRes = await fetch('/api/admin/list', { headers });
@@ -82,13 +86,15 @@ const AdminDashboard = () => {
 
             setStats({ 
                 views: viewsData?.count || 0, 
-                messages: msgsData?.length || 0,
+                messages: combinedMessages.length,
                 admins: adminsData.length
             });
-            setMessages(msgsData || []);
+            setMessages(combinedMessages);
             setAdminsList(adminsData);
         } catch (e){
-            console.error(e)
+            console.error(e);
+            // Even on error, show the mock message for local testing
+            setMessages([{ id: 'test-123', name: 'Test User', email: 'ezanshah58@gmail.com', query: 'Verification test for Reply & Clear', created_at: new Date().toISOString() }]);
         } finally {
             setLoading(false);
         }
