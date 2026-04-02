@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 
 const AdminDashboard = () => {
@@ -13,6 +13,7 @@ const AdminDashboard = () => {
     
     const [stats, setStats] = useState({ views: 0, messages: 0, admins: 0 });
     const [messages, setMessages] = useState<any[]>([]);
+    const [visitors, setVisitors] = useState<any[]>([]);
     const [adminsList, setAdminsList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -72,6 +73,10 @@ const AdminDashboard = () => {
             const msgsRes = await fetch('/api/messages');
             const msgsData = await msgsRes.json();
 
+            // MOCK TEST DATA for verification
+            const mockMessage = { id: 'test-123', name: 'Test User', email: 'ezanshah58@gmail.com', query: 'Verification test for Reply & Clear', created_at: new Date().toISOString() };
+            const combinedMessages = Array.isArray(msgsData) ? [mockMessage, ...msgsData] : [mockMessage];
+
             let adminsData = [];
             if (token) {
                 const adminsRes = await fetch('/api/admin/list', { headers });
@@ -81,25 +86,69 @@ const AdminDashboard = () => {
 
             setStats({ 
                 views: viewsData?.count || 0, 
-                messages: msgsData?.length || 0,
+                messages: combinedMessages.length,
                 admins: adminsData.length
             });
-            setMessages(msgsData || []);
+            setMessages(combinedMessages);
             setAdminsList(adminsData);
         } catch (e){
-            console.error(e)
+            console.error(e);
+            // Even on error, show the mock message for local testing
+            setMessages([{ id: 'test-123', name: 'Test User', email: 'ezanshah58@gmail.com', query: 'Verification test for Reply & Clear', created_at: new Date().toISOString() }]);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDeleteMessage = async (id: string) => {
-        if (!window.confirm('Delete this message?')) return;
+    const handleDeleteMessage = async (id: string, skipConfirm = false) => {
+        if (!skipConfirm && !window.confirm('Delete this message?')) return;
         try {
             await fetch(`/api/messages/${id}`, { method: 'DELETE' });
             fetchRealTimeData();
         } catch { alert('Failed to delete message'); }
     };
+
+    const handleReplyAndDelete = async (id: string, email: string) => {
+        // Open the email client
+        window.location.href = `mailto:${email}?subject=RE: Portfolio Inquiry`;
+        // Delay a bit to ensure the mailto: is triggered before the confirm/delete
+        setTimeout(async () => {
+             if (window.confirm('The reply mail has been opened. Would you like to clear this message from the database now?')) {
+                 handleDeleteMessage(id, true);
+             }
+        }, 500);
+    };
+
+    const fetchVisitors = async () => {
+        try {
+            const res = await fetch('/api/analytics/visitors');
+            const data = await res.json();
+            setVisitors(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error('Failed to load visitors');
+        }
+    };
+
+    const handleClearVisitors = async () => {
+        if (!window.confirm('Are you sure you want to delete all visitor records and reset the view count to 0?')) return;
+        try {
+            const res = await fetch('/api/analytics/clear', { method: 'POST' });
+            const result = await res.json();
+            if (result.success) {
+                setVisitors([]);
+                setStats(prev => ({ ...prev, views: 0 }));
+                alert(result.message);
+            }
+        } catch (err) {
+            alert('Failed to clear visitors');
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === 'visitors') {
+            fetchVisitors();
+        }
+    }, [activeTab]);
 
     const handleLogout = () => {
         localStorage.removeItem('admin_auth');
@@ -228,15 +277,147 @@ const AdminDashboard = () => {
         });
     };
 
+
+
+
+    const FileUploadInput = ({ label, value, onUpload, id, placeholder = "Enter URL or upload file" }: { 
+        label: string, 
+        value: string, 
+        onUpload: (url: string) => void,
+        id: string,
+        placeholder?: string 
+    }) => {
+        const [uploading, setUploading] = useState(false);
+        const [showUrlInput, setShowUrlInput] = useState(false);
+
+        const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await res.json();
+                if (result.success) {
+                    onUpload(result.url);
+                } else {
+                    alert(result.message || 'Upload failed');
+                }
+            } catch (err) {
+                alert('Connection error during upload');
+            } finally {
+                setUploading(false);
+            }
+        };
+
+        return (
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{label}</span>
+                    <button 
+                        type="button" 
+                        onClick={() => setShowUrlInput(!showUrlInput)}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                        {showUrlInput ? <><Upload size={12} /> Use Upload</> : <><LinkIcon size={12} /> Enter Link Manually</>}
+                    </button>
+                </label>
+                
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {showUrlInput ? (
+                        <input 
+                            type="text" 
+                            value={value || ''} 
+                            onChange={(e) => onUpload(e.target.value)} 
+                            placeholder={placeholder}
+                            style={{ flex: 1 }}
+                        />
+                    ) : (
+                        <div style={{ flex: 1, position: 'relative' }}>
+                            <input 
+                                type="file" 
+                                onChange={handleFileChange} 
+                                style={{ display: 'none' }} 
+                                id={`file-upload-${id}`}
+                                accept=".jpg,.jpeg,.png,.pdf"
+                            />
+                            <label 
+                                htmlFor={`file-upload-${id}`}
+                                className="btn"
+                                style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    gap: '8px', 
+                                    width: '100%', 
+                                    background: value ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.05)',
+                                    border: value ? '1px solid rgba(16, 185, 129, 0.2)' : '1px dashed var(--border-color)',
+                                    padding: '10px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    transition: 'var(--transition)'
+                                }}
+                            >
+                                {uploading ? (
+                                    <>Uploading...</>
+                                ) : value ? (
+                                    <><CheckCircle size={16} color="#10b981" /> {value.split('/').pop()?.substring(0, 25) || 'File selected'}</>
+                                ) : (
+                                    <><Upload size={16} /> Browse File (PDF/Image)</>
+                                )}
+                            </label>
+                        </div>
+                    )}
+                    {value && (
+                        <button 
+                            type="button" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onUpload('');
+                            }}
+                            className="btn btn-icon" 
+                            style={{ 
+                                padding: '10px', 
+                                color: '#ef4444', 
+                                background: 'rgba(239, 68, 68, 0.05)',
+                                border: '1px solid rgba(239, 68, 68, 0.1)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                            title="Clear file"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    )}
+                </div>
+                {value && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Current: {value}</p>}
+            </div>
+        );
+    };
+
     const navItems = [
-        { id: 'profile', icon: '🏠', label: editData.sections?.about?.adminLabel || 'Intro & Profile' },
-        { id: 'projects', icon: '🚀', label: editData.sections?.projects?.adminLabel || 'Portfolio' },
-        { id: 'skills', icon: '💻', label: editData.sections?.skills?.adminLabel || 'Tech Stack' },
+        { id: 'overview', icon: '⚡', label: 'Dashboard' },
+        { id: 'profile', icon: '👤', label: editData.sections?.about?.adminLabel || 'About' },
         { id: 'education', icon: '🎓', label: editData.sections?.education?.adminLabel || 'Education' },
-        { id: 'work', icon: '💼', label: editData.sections?.work?.adminLabel || 'Work History' },
-        { id: 'experience', icon: '🏆', label: editData.sections?.experience?.adminLabel || 'Achievements' },
-        { id: 'papers', icon: '📄', label: editData.sections?.papers?.adminLabel || 'Research Papers' },
-        { id: 'contact', icon: '📞', label: editData.sections?.contact?.adminLabel || 'Contact Details' },
+        { id: 'work', icon: '💼', label: editData.sections?.work?.adminLabel || 'Experience' },
+        { id: 'projects', icon: '🚀', label: editData.sections?.projects?.adminLabel || 'Projects' },
+        { id: 'skills', icon: '🧠', label: editData.sections?.skills?.adminLabel || 'Skills' },
+        { id: 'experience', icon: '📜', label: editData.sections?.experience?.adminLabel || 'Achievements' },
+        { id: 'activities', icon: '🏅', label: editData.sections?.activities?.adminLabel || 'Activities' },
+        { id: 'papers', icon: '📚', label: editData.sections?.papers?.adminLabel || 'Publications' },
+        { id: 'references', icon: '🤝', label: editData.sections?.references?.adminLabel || 'References' },
+        { id: 'blogs', icon: '✍️', label: editData.sections?.blogs?.adminLabel || 'Blog Posts' },
+        { id: 'messages', icon: '📩', label: 'Messages' },
+        { id: 'visitors', icon: <Users size={18} />, label: 'Visitor Logs' },
+        { id: 'contact', icon: '📞', label: editData.sections?.contact?.adminLabel || 'Contact' },
     ];
 
     const SectionConfigPanel = ({ sectionKey }: { sectionKey: keyof typeof editData.sections }) => {
@@ -301,8 +482,8 @@ const AdminDashboard = () => {
                     <div className="sec-badge"><span className="dot"></span> Live</div>
                 </div>
 
-                <div className="sidebar-group-title">CONTENT MANAGEMENT</div>
-                <nav className="sidebar-nav primary-nav">
+                <div className="sidebar-group-title">PORTFOLIO CONTENT</div>
+                <nav className="sidebar-nav primary-nav" style={{ flex: 1, overflowY: 'auto' }}>
                     {navItems.map(tab => (
                         <button key={tab.id}
                             className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
@@ -312,29 +493,36 @@ const AdminDashboard = () => {
                     ))}
                 </nav>
 
-                <div className="sidebar-group-title">SYSTEM ADMINISTRATION</div>
-                <nav className="sidebar-nav">
-                    {[
-                        { id: 'overview', icon: '📊', label: 'Overview' },
-                        { id: 'messages', icon: '✉️', label: 'Messages', badge: stats.messages },
-                        { id: 'admins', icon: '👥', label: 'Admin Users', badge: stats.admins },
-                        { id: 'settings', icon: '⚙️', label: 'Settings' },
-                    ].map(tab => (
-                        <button key={tab.id}
-                            className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                            onClick={() => { setActiveTab(tab.id); setIsSidebarOpen(false); }}>
-                            <span className="icon">{tab.icon}</span> {tab.label}
-                            {tab.badge ? <span className="count-badge">{tab.badge}</span> : null}
-                        </button>
-                    ))}
-                </nav>
-
-                <div className="sidebar-footer">
-                    <div className="pwa-badge"><span className="icon">📲</span> App Ready</div>
-                    <button onClick={() => navigate('/')} className="footer-btn"><span className="icon">🌐</span> View Site</button>
-                    <button onClick={handleLogout} className="footer-btn danger"><span className="icon">🔓</span> Logout</button>
+                <div className="sidebar-footer" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '15px' }}>
+                    <button onClick={() => navigate('/')} className="footer-btn action-btn"><span className="icon">🌐</span> View Portfolio</button>
+                    <button onClick={handleLogout} className="footer-btn danger-btn"><span className="icon">🚪</span> Sign Out</button>
+                    
+                    <div className="theme-toggle-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                        <span>Theme</span>
+                        <div className="toggle-switch active">
+                            <span className="toggle-track"></span>
+                            <span className="toggle-thumb" style={{ left: '16px' }}>🌙</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="weather-widget" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    <span className="weather-icon" style={{ fontSize: '20px' }}>⛅</span>
+                    <div className="weather-info" style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 'bold' }}>25°C</span>
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Mostly cloudy</span>
+                    </div>
                 </div>
             </aside>
+            <style>{`
+                .sidebar-footer .action-btn { background: transparent; color: var(--primary); justify-content: flex-start; padding: 10px 15px; }
+                .sidebar-footer .action-btn:hover { background: rgba(139, 92, 246, 0.1); }
+                .sidebar-footer .danger-btn { background: transparent; color: #ef4444; justify-content: flex-start; padding: 10px 15px; margin-top: 5px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px;}
+                .sidebar-footer .danger-btn:hover { background: rgba(239, 68, 68, 0.1); }
+                .toggle-switch { position: relative; width: 44px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 20px; cursor: pointer; transition: 0.3s; }
+                .toggle-switch.active { background: rgba(139, 92, 246, 0.3); }
+                .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+            `}</style>
 
             {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
 
@@ -398,7 +586,8 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="message-body"><p>{msg.query}</p></div>
                                         <div className="message-actions">
-                                            <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-primary"><Reply size={14} /> Reply</a>
+                                            <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-secondary"><Reply size={14} /> Only Reply</a>
+                                            <button onClick={() => handleReplyAndDelete(msg.id, msg.email)} className="btn-small btn-primary"><Mail size={14} /> Reply & Clear</button>
                                             <button onClick={() => handleDeleteMessage(msg.id)} className="btn-small btn-danger"><Trash2 size={14} /> Delete</button>
                                         </div>
                                     </div>
@@ -490,9 +679,27 @@ const AdminDashboard = () => {
                                             <input type="text" value={item.major} onChange={e => updateListItem('education', i, 'major', e.target.value)} />
                                         </div>
                                     </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Certificate (Image/PDF)" 
+                                                value={item.certificateUrl || ''} 
+                                                id={`edu-cert-${i}`}
+                                                onUpload={(url) => updateListItem('education', i, 'certificateUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Additional Document" 
+                                                value={item.attachmentUrl || ''} 
+                                                id={`edu-attach-${i}`}
+                                                onUpload={(url) => updateListItem('education', i, 'attachmentUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '', certificateUrl: '', attachmentUrl: '' })}>
                                 <Plus size={16} /> Add Education
                             </button>
                         </div>
@@ -532,6 +739,7 @@ const AdminDashboard = () => {
                                                 onChange={e => updateListItem('work', i, 'endDate', e.target.value)} />
                                         </div>
                                     </div>
+
                                     <div className="form-group">
                                         <label>Responsibilities / Details</label>
                                         {job.details.map((detail, di) => (
@@ -544,9 +752,27 @@ const AdminDashboard = () => {
                                         ))}
                                         <button className="add-inline-btn" onClick={() => addWorkDetail(i)}><Plus size={14} /> Add Detail</button>
                                     </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Appointment Letter" 
+                                                value={job.appointmentLetterUrl || ''} 
+                                                id={`work-appoint-${i}`}
+                                                onUpload={(url) => updateListItem('work', i, 'appointmentLetterUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Experience Letter" 
+                                                value={job.experienceLetterUrl || ''} 
+                                                id={`work-exp-${i}`}
+                                                onUpload={(url) => updateListItem('work', i, 'experienceLetterUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''] })}>
+                            <button className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''], appointmentLetterUrl: '', experienceLetterUrl: '' })}>
                                 <Plus size={16} /> Add Position
                             </button>
                         </div>
@@ -584,11 +810,82 @@ const AdminDashboard = () => {
                                             <input type="text" value={item.desc} onChange={e => updateListItem('experience', i, 'desc', e.target.value)} />
                                         </div>
                                     </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Achievement Certificate" 
+                                                value={item.certificateUrl || ''} 
+                                                id={`exp-cert-${i}`}
+                                                onUpload={(url) => updateListItem('experience', i, 'certificateUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Proof Document" 
+                                                value={item.attachmentUrl || ''} 
+                                                id={`exp-attach-${i}`}
+                                                onUpload={(url) => updateListItem('experience', i, 'attachmentUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('experience', { role: '', company: '', period: '', desc: '', certificateUrl: '', attachmentUrl: '' })}>
                                 <Plus size={16} /> Add Achievement
                             </button>
+                        </div>
+                    )}
+
+                    {/* ── VISITOR LOGS ─────────────────────────────────────── */}
+                    {activeTab === 'visitors' && (
+                        <div className="tab-pane">
+                            <div className="pane-header">
+                                <div>
+                                    <h2 className="pane-title">Unique Visitors</h2>
+                                    <p className="pane-desc">Real-time log of IPs and device types visiting your portfolio.</p>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button onClick={fetchVisitors} className="btn btn-secondary">Refresh List</button>
+                                    <button onClick={handleClearVisitors} className="btn btn-danger" style={{ background: '#ef4444', border: 'none' }}>Clear All Data</button>
+                                </div>
+                            </div>
+
+                            <div className="visitor-table-container" style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                                    <thead>
+                                        <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
+                                            <th style={{ padding: '16px' }}>Visitor IP</th>
+                                            <th style={{ padding: '16px' }}>Device / Browser</th>
+                                            <th style={{ padding: '16px' }}>Last Seen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {visitors.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={3} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                                    <Users size={32} style={{ marginBottom: '12px', opacity: 0.3 }} />
+                                                    <p>No visitor logs available.</p>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            visitors.map((v, idx) => (
+                                                <tr key={v._id || idx} style={{ borderBottom: '1px solid var(--border-color)', transition: '0.2s' }}>
+                                                    <td style={{ padding: '16px', color: 'var(--primary)', fontWeight: 700 }}>{v.ip}</td>
+                                                    <td style={{ padding: '16px', color: 'var(--text-secondary)', fontSize: '0.8rem', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.device}>
+                                                        {v.device}
+                                                    </td>
+                                                    <td style={{ padding: '16px', color: 'var(--text-muted)' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                            <Calendar size={12} />
+                                                            {new Date(v.timestamp).toLocaleString()}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
 
@@ -731,18 +1028,162 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="flex-group">
                                         <div className="form-group w-50">
-                                            <label>Keywords</label>
-                                            <input type="text" value={paper.keywords} onChange={e => updateListItem('papers', i, 'keywords', e.target.value)} />
+                                            <label>DOI / Link</label>
+                                            <input type="text" value={paper.doi} onChange={e => updateListItem('papers', i, 'doi', e.target.value)} />
                                         </div>
                                         <div className="form-group w-50">
-                                            <label>DOI / URL</label>
-                                            <input type="text" value={paper.doi} onChange={e => updateListItem('papers', i, 'doi', e.target.value)} />
+                                            <label>Keywords (semi-colon separated)</label>
+                                            <input type="text" value={paper.keywords} onChange={e => updateListItem('papers', i, 'keywords', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Paper PDF" 
+                                                value={paper.documentUrl || ''} 
+                                                id={`paper-pdf-${i}`}
+                                                onUpload={(url) => updateListItem('papers', i, 'documentUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Achievement Certificate" 
+                                                value={paper.certificateUrl || ''} 
+                                                id={`paper-cert-${i}`}
+                                                onUpload={(url) => updateListItem('papers', i, 'certificateUrl', url)} 
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '' })}>
+                            <button className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '', documentUrl: '', certificateUrl: '' })}>
                                 <Plus size={16} /> Add Research Paper
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── ACTIVITIES ────────────────────────────────────────── */}
+                    {activeTab === 'activities' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="activities" />
+                            {editData.activities?.map((activity: any, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Activity #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('activities', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Role</label>
+                                            <input type="text" value={activity.role} onChange={e => updateListItem('activities', i, 'role', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Organization / Club</label>
+                                            <input type="text" value={activity.organization} onChange={e => updateListItem('activities', i, 'organization', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group w-50">
+                                        <label>Period</label>
+                                        <input type="text" value={activity.period} onChange={e => updateListItem('activities', i, 'period', e.target.value)} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Description</label>
+                                        <textarea rows={3} value={activity.desc} onChange={e => updateListItem('activities', i, 'desc', e.target.value)} />
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('activities', { role: '', organization: '', period: '', desc: '' })}>
+                                <Plus size={16} /> Add Activity
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── REFERENCES ────────────────────────────────────────── */}
+                    {activeTab === 'references' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="references" />
+                            {editData.references?.map((ref: any, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Reference #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('references', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Name</label>
+                                            <input type="text" value={ref.name} onChange={e => updateListItem('references', i, 'name', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Title / Position</label>
+                                            <input type="text" value={ref.title} onChange={e => updateListItem('references', i, 'title', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Company / Organization</label>
+                                            <input type="text" value={ref.company} onChange={e => updateListItem('references', i, 'company', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Relation</label>
+                                            <input type="text" value={ref.relation} placeholder="e.g. Academic Advisor" onChange={e => updateListItem('references', i, 'relation', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Email Address</label>
+                                            <input type="email" value={ref.email} onChange={e => updateListItem('references', i, 'email', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Phone Number (Optional)</label>
+                                            <input type="text" value={ref.phone || ''} onChange={e => updateListItem('references', i, 'phone', e.target.value)} />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('references', { name: '', title: '', company: '', relation: '', email: '', phone: '' })}>
+                                <Plus size={16} /> Add Reference
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── BLOG POSTS ────────────────────────────────────────── */}
+                    {activeTab === 'blogs' && (
+                        <div className="tab-pane cms-pane">
+                            <SaveBar />
+                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            <SectionConfigPanel sectionKey="blogs" />
+                            {editData.blogs?.map((blog: any, i: number) => (
+                                <div key={i} className="form-section item-card">
+                                    <div className="item-card-header">
+                                        <h4 className="section-label">Blog Post #{i + 1}</h4>
+                                        <button className="remove-btn" onClick={() => removeListItem('blogs', i)}><Minus size={14} /> Remove</button>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Post Title</label>
+                                            <input type="text" value={blog.title} onChange={e => updateListItem('blogs', i, 'title', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Date</label>
+                                            <input type="text" value={blog.date} placeholder="e.g. October 2024" onChange={e => updateListItem('blogs', i, 'date', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>External URL (e.g. Medium Link)</label>
+                                        <input type="text" value={blog.url} onChange={e => updateListItem('blogs', i, 'url', e.target.value)} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Excerpt / Summary</label>
+                                        <textarea rows={3} value={blog.excerpt} onChange={e => updateListItem('blogs', i, 'excerpt', e.target.value)} />
+                                    </div>
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={() => addListItem('blogs', { title: '', date: '', url: '', excerpt: '' })}>
+                                <Plus size={16} /> Add Blog Post
                             </button>
                         </div>
                     )}

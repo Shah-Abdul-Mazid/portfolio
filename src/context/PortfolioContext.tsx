@@ -10,6 +10,9 @@ export interface EducationItem {
     school: string;
     year: string;
     major: string;
+    attachmentUrl?: string; // Newly added
+    attachmentLabel?: string; // Newly added
+    certificateUrl?: string; // Add certificate support for consistency if desired
 }
 
 export interface ExperienceItem {
@@ -17,6 +20,9 @@ export interface ExperienceItem {
     company: string;
     period: string;
     desc: string;
+    attachmentUrl?: string;
+    attachmentLabel?: string;
+    certificateUrl?: string;
 }
 
 export interface WorkItem {
@@ -25,6 +31,11 @@ export interface WorkItem {
     startDate: string; // ISO format (e.g., 2022-01-03)
     endDate?: string;  // ISO format, null/empty = "Ongoing"
     details: string[];
+    attachmentUrl?: string;
+    attachmentLabel?: string;
+    certificateUrl?: string;
+    appointmentLetterUrl?: string;
+    experienceLetterUrl?: string;
 }
 
 export interface ProjectItem {
@@ -41,6 +52,31 @@ export interface PaperItem {
     year: string;
     keywords: string;
     doi: string;
+    documentUrl?: string; // New: PDF/Document viewer link
+    certificateUrl?: string; // New: Certificate/Image viewer link
+}
+
+export interface ActivityItem {
+    role: string;
+    organization: string;
+    period: string;
+    desc: string;
+}
+
+export interface ReferenceItem {
+    name: string;
+    title: string;
+    company: string;
+    email: string;
+    phone?: string;
+    relation: string;
+}
+
+export interface BlogItem {
+    title: string;
+    date: string;
+    excerpt: string;
+    url: string;
 }
 
 export interface SectionConfig {
@@ -59,6 +95,9 @@ export interface PortfolioData {
         skills: SectionConfig;
         projects: SectionConfig;
         papers: SectionConfig;
+        activities: SectionConfig; // New section
+        references: SectionConfig; // New section
+        blogs: SectionConfig; // New section
         contact: SectionConfig;
     };
     hero: {
@@ -77,6 +116,9 @@ export interface PortfolioData {
     work: WorkItem[];
     projects: ProjectItem[];
     papers: PaperItem[];
+    activities: ActivityItem[]; // New
+    references: ReferenceItem[]; // New
+    blogs: BlogItem[]; // New
     contact: {
         email: string;
         phone: string;
@@ -96,6 +138,9 @@ const defaultData: PortfolioData = {
         skills: { navLabel: 'Skills', adminLabel: 'Tech Stack', subtitle: 'Technical Stack', title: 'Core Expertise' },
         projects: { navLabel: 'Projects', adminLabel: 'Portfolio', subtitle: 'Projects', title: 'Featured Projects' },
         papers: { navLabel: 'Research', adminLabel: 'Research Papers', subtitle: 'Publications', title: 'Research Papers' },
+        activities: { navLabel: 'Activities', adminLabel: 'Extracurriculars', subtitle: 'Involvement', title: 'Extracurricular Activities' },
+        references: { navLabel: 'References', adminLabel: 'References', subtitle: 'Recommendations', title: 'Professional References' },
+        blogs: { navLabel: 'Blog', adminLabel: 'Blog Posts', subtitle: 'Writing', title: 'Recent Blog Posts' },
         contact: { navLabel: 'Contact', adminLabel: 'Contact Details', subtitle: 'Contact', title: 'Let\'s Start a Conversation' }
     },
     hero: {
@@ -120,13 +165,26 @@ const defaultData: PortfolioData = {
         { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 – 2018', major: 'Science' }
     ],
     experience: [
-        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.' },
+        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.', certificateUrl: '/data/work-certificate.png' },
         { role: 'IT Olympiad', company: 'CSE FEST 2024', period: '2024', desc: 'Department of Computer Science & Engineering, East West University.' },
         { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certified participant in the campus-wide coding battle.' }
     ],
     work: [
-        { role: 'Campus Ambassador', company: 'eshikhon', startDate: '2022-01-03', endDate: '2025-12-30', details: ['Represented the organization on campus.', 'Organized tech workshops and events.', 'Promoted digital learning among students.'] },
-        { role: 'Software Engineer', company: 'softvence Omega', startDate: '2026-02-01', endDate: '', details: ['Developing innovative AI solutions.', 'Implementing premium web architectures.', 'Contributing to research projects.'] }
+        { 
+            role: 'Campus Ambassador', 
+            company: 'eshikhon', 
+            startDate: '2022-01-03', 
+            endDate: '2025-12-30', 
+            details: ['Represented the organization on campus.', 'Organized tech workshops and events.', 'Promoted digital learning among students.'],
+            appointmentLetterUrl: '/data/eshikhon-appointment-letter.pdf'
+        },
+        { 
+            role: 'Software Engineer', 
+            company: 'softvence Omega', 
+            startDate: '2026-02-01', 
+            endDate: '', 
+            details: ['Developing innovative AI solutions.', 'Implementing premium web architectures.', 'Contributing to research projects.']
+        }
     ],
     projects: [
         { title: 'AI-Powered E-Commerce Customer Support Chatbot', desc: 'This project implements an AI-powered customer support chatbot for an e-commerce store using n8n, OpenAI, Pinecone, and Shopify.', tags: ['n8n', 'OpenAI', 'Pinecone', 'Shopify'], showcase: 1 },
@@ -186,6 +244,15 @@ const defaultData: PortfolioData = {
             doi: '10.1109/ICDM50133.2023.0039' 
         }
     ],
+    activities: [
+        { role: 'Event Organizer', organization: 'EWU Computer Club', period: '2022 - 2023', desc: 'Organized national programming contests and technical workshops for over 500 participants.' }
+    ],
+    references: [
+        { name: 'Dr. Example Professor', title: 'Head of CSE Department', company: 'East West University', email: 'professor@ewubd.edu', relation: 'Academic Advisor' }
+    ],
+    blogs: [
+        { title: 'The Future of AI in Web Development', date: 'October 2024', excerpt: 'Exploring how large language models are fundamentally changing how we approach UI engineering.', url: '#' }
+    ],
     contact: {
         email: "shahabdulmazid.ezan@yahoo.com",
         phone: "+880 1531-329222",
@@ -205,6 +272,41 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 const API_BASE = '/api';
 
+// Helper to resolve document URLs (strips localhost if present, ensuring it works in prod)
+export const resolveUrl = (url: string | undefined): string => {
+    if (!url) return '';
+    // If it's already a full production URL or a relative path, keep it
+    if (url.startsWith('https://') || url.startsWith('http://') && !url.includes('localhost')) {
+        return url;
+    }
+    // If it's a localhost URL, convert to relative /uploads
+    if (url.includes('localhost:3001/uploads/')) {
+        return url.split('localhost:3001')[1];
+    }
+    // For relative paths like /uploads/..., prefix with backend URL in development
+    // In production (Vercel), since it's proxied/served from same origin, /uploads/... works
+    const isDev = window.location.hostname === 'localhost';
+    if (url.startsWith('/uploads/') && isDev) {
+        return `http://localhost:3001${url}`;
+    }
+    return url;
+};
+
+const sanitizeData = (obj: any): any => {
+    if (typeof obj !== 'object' || obj === null) {
+        if (typeof obj === 'string' && obj.startsWith('/data/')) {
+            return obj.replace(/ /g, '-');
+        }
+        return obj;
+    }
+    if (Array.isArray(obj)) return obj.map(sanitizeData);
+    const newObj: any = {};
+    for (const key in obj) {
+        newObj[key] = sanitizeData(obj[key]);
+    }
+    return newObj;
+};
+
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [data, setData] = useState<PortfolioData>(defaultData);
 
@@ -222,8 +324,9 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                             sections: { ...defaultData.sections, ...(dbData.sections || {}) },
                             contact: { ...defaultData.contact, ...(dbData.contact || {}) } 
                         };
-                        setData(merged);
-                        localStorage.setItem('portfolio_data', JSON.stringify(merged));
+                        const sanitized = sanitizeData(merged);
+                        setData(sanitized);
+                        localStorage.setItem('portfolio_data', JSON.stringify(sanitized));
                         return;
                     }
                 }
@@ -235,12 +338,13 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    setData({ 
+                    const merged = { 
                         ...defaultData, 
                         ...parsed, 
                         sections: { ...defaultData.sections, ...(parsed.sections || {}) },
                         contact: { ...defaultData.contact, ...(parsed.contact || {}) } 
-                    });
+                    };
+                    setData(sanitizeData(merged));
                 } catch {
                     setData(defaultData);
                 }
